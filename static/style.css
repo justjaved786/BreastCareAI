@@ -1,0 +1,382 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #fce4ec, #f8bbd0);
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 15px 40px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.navbar .logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #d81b60;
+}
+
+.navbar ul.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+}
+
+.navbar ul li a {
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar ul li a:hover {
+  color: #d81b60;
+}
+
+.account-btns .btn-sm {
+  padding: 6px 14px;
+  margin-left: 10px;
+  border: 1px solid #d81b60;
+  background: #fff;
+  color: #d81b60;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.account-btns .btn-sm:hover {
+  background: #d81b60;
+  color: white;
+}
+
+/* Hero Section */
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 50px;
+  background: linear-gradient(to right, #fce4ec, #f8bbd0);
+}
+
+.hero-text {
+  flex: 1 1 50%;
+  padding-right: 30px;
+}
+
+.hero-text h1 {
+  font-size: 42px;
+  color: #ad1457;
+  margin-bottom: 15px;
+}
+
+.hero-text h3 {
+  font-size: 22px;
+  color: #6a1b9a;
+  margin-bottom: 10px;
+}
+
+.hero-text p {
+  font-size: 16px;
+  color: #555;
+  max-width: 500px;
+  margin-bottom: 25px;
+}
+
+.start-btn {
+  background: #ec407a;
+  color: #fff;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.start-btn:hover {
+  background: #c2185b;
+}
+
+.hero-image {
+  flex: 1 1 40%;
+  text-align: center;
+}
+
+.hero-image img {
+  max-width: 70%;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* About Section */
+.about {
+  padding: 60px 40px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.about h2 {
+  color: #c2185b;
+  margin-bottom: 20px;
+}
+
+.about p {
+  max-width: 800px;
+  margin: auto;
+  color: #555;
+}
+
+/* Features Section */
+.features {
+  background-color: #fff0f5;
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.features h2 {
+  color: #c2185b;
+  margin-bottom: 40px;
+}
+
+.features-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.feature-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 260px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-card i {
+  font-size: 32px;
+  color: #ec407a;
+  margin-bottom: 10px;
+}
+
+.feature-card h4 {
+  margin-bottom: 10px;
+  color: #ad1457;
+}
+
+/* Footer */
+.site-footer {
+  background: #fff;
+  border-top: 1px solid #ffe0ec;
+  text-align: center;
+  padding: 30px 10px 20px;
+  font-family: 'Poppins', sans-serif;
+  color: #555;
+}
+
+.footer-container {
+  max-width: 900px;
+  margin: auto;
+}
+
+.footer-title {
+  font-weight: 600;
+  font-size: 18px;
+  color: #222;
+  margin-top: 15px;
+}
+
+.footer-icons {
+  margin: 15px 0;
+}
+
+.footer-icons a {
+  margin: 0 10px;
+  font-size: 20px;
+  color: #e91e63;
+  transition: transform 0.3s ease;
+}
+
+.footer-icons a:hover {
+  transform: scale(1.2);
+  color: #ad1457;
+}
+
+.footer-note {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    padding: 40px 20px;
+  }
+
+  .hero-text, .hero-image {
+    flex: 1 1 100%;
+    padding: 0;
+    text-align: center;
+  }
+
+  .hero-text h1 {
+    font-size: 30px;
+  }
+
+  .hero-image img {
+    max-width: 80%;
+  }
+
+  .features-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar ul {
+    flex-direction: column;
+    margin-top: 10px;
+  }
+
+  .account-btns {
+    margin-top: 10px;
+  }
+}
+/* Toast Notification */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1050;
+}
+
+.toast {
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 250px;
+  animation: slideIn 0.3s ease;
+}
+
+.toast .btn-close {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: white;
+  margin-left: 15px;
+  cursor: pointer;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Danger Toast (for error messages) */
+.toast-danger {
+  background-color: #e53935;
+
+}
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Toast Container */
+.toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1055;
+}
+
+/* Toast box style */
+.toast {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    min-width: 250px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+}
+
+/* Show animation */
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Close button */
+.toast .btn-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    margin-left: auto;
+    cursor: pointer;
+}
+
+/* Success toast */
+.toast-success {
+    background-color: #4caf50;
+}
+
+/* Error toast */
+.toast-danger {
+    background-color: #e53935;
+}
+/* Success Toast (for success messages) */
+

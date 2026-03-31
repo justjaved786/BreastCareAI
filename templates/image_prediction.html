@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histopathology Image Prediction - BreastCare AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-pink: #e91e63;
+            --secondary-pink: #ad1457;
+            --accent-pink: #ec407a;
+            --gradient-purple: #8e24aa;
+            --light-pink: #f8bbd9;
+            --light-bg: #fce4ec;
+            --card-bg: #ffffff;
+            --text-dark: #212121;
+            --text-light: #757575;
+            --bg-white: #ffffff;
+            --bg-pink-100: #fce7f3;
+            --text-gray-800: #1f2937;
+            --text-gray-700: #374151;
+            --text-gray-600: #4b5563;
+            --text-gray-400: #9ca3af;
+            --text-color: #1f2937;
+            --result-card-bg: #ffffff;
+            --confidence-bg: #e5e7eb;
+        }
+       
+        [data-theme="dark"] {
+            --primary-pink: #f48fb1;
+            --secondary-pink: #ad1457;
+            --accent-pink: #f06292;
+            --light-pink: #4a1a2d;
+            --light-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-dark: #f5f5f5;
+            --text-light: #b0b0b0;
+            --bg-white: #2d2d2d;
+            --bg-pink-100: #4a1a2d;
+            --text-gray-800: #f5f5f5;
+            --text-gray-700: #e5e7eb;
+            --text-gray-600: #d1d5db;
+            --text-gray-400: #9ca3af;
+            --text-color: #ffffff;
+            --result-card-bg: #3d3d3d;
+            --confidence-bg: #4b5563;
+        }
+       
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Full-width navbar */
+        .navbar-container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        /* Navigation styles */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        }
+       
+        [data-theme="dark"] .glass {
+            background: rgba(45, 45, 45, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+            color: var(--text-gray-700);
+        }
+       
+        [data-theme="dark"] .nav-link {
+            color: var(--text-gray-700);
+        }
+       
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            transition: width 0.3s ease;
+        }
+       
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(233, 30, 99, 0.1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(233, 30, 99, 0.4);
+        }
+
+        /* Enhanced upload area */
+        .upload-area {
+            border: 2px dashed var(--text-gray-400);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-pink);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 30, 99, 0.1);
+        }
+
+        .upload-area.drag-over {
+            border-color: var(--primary-pink);
+            background: rgba(233, 30, 99, 0.05);
+            transform: scale(1.01);
+        }
+
+        .upload-filename {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--primary-pink);
+            display: none;
+        }
+
+        /* Enhanced image preview */
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Result card with dark mode support */
+        .result-card {
+            background: var(--result-card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+
+        .result-card.benign {
+            border-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), var(--result-card-bg));
+        }
+
+        .result-card.malignant {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), var(--result-card-bg));
+        }
+
+        [data-theme="dark"] .result-card.benign {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), var(--result-card-bg));
+        }
+
+        [data-theme="dark"] .result-card.malignant {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), var(--result-card-bg));
+        }
+
+        .confidence-bar {
+            height: 12px;
+            border-radius: 6px;
+            background: var(--confidence-bg);
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.8s ease;
+        }
+
+        /* Model info box with dark mode support */
+        .model-info-box {
+            background: var(--bg-pink-100);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-pink);
+        }
+
+        [data-theme="dark"] .model-info-box {
+            background: rgba(244, 143, 177, 0.1);
+        }
+
+        /* Histopathology info box */
+        .histo-info-box {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.08), rgba(142, 36, 170, 0.08));
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid rgba(233, 30, 99, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        [data-theme="dark"] .histo-info-box {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.15), rgba(142, 36, 170, 0.15));
+            border-color: rgba(233, 30, 99, 0.3);
+        }
+
+        /* Full-width footer */
+        .footer-container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-content {
+            padding: 4rem 1.5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Text color utilities */
+        .text-gray-800 { color: var(--text-gray-800); }
+        .text-gray-700 { color: var(--text-gray-700); }
+        .text-gray-600 { color: var(--text-gray-600); }
+        .text-gray-400 { color: var(--text-gray-400); }
+
+        [data-theme="dark"] .bg-white {
+            background-color: var(--bg-white);
+        }
+
+        /* Main content container */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation - Fixed full-width -->
+    <nav class="glass sticky top-0 z-50 py-4">
+        <div class="navbar-container">
+            <div class="navbar-content">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-ribbon text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold" style="color: var(--text-color);">
+                        BreastCare<span style="color: #ec4899;">AI</span>
+                    </span>
+                </div>
+               
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/common-page" class="nav-link font-medium">Dashboard</a>
+                    <a href="/data-prediction" class="nav-link font-medium">Data Analysis</a>
+                    <a href="/image-prediction" class="nav-link font-medium text-pink-600">Image Analysis</a>
+                    <a href="/symptoms-assessment" class="nav-link font-medium">Symptoms Analysis</a>
+                </div>
+               
+                <div class="flex items-center space-x-4">
+                    <button id="navThemeToggle" class="theme-toggle">
+                        <i class="fas fa-moon" id="navThemeIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+<div class="main-content">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold mb-4" style="color: var(--text-color);">
+            Histopathology Image Analysis
+        </h1>
+        <p class="text-lg" style="color: var(--text-light);">
+            Upload histopathology images to receive an AI-based classification insight
+            using image pattern analysis.
+        </p>
+        <div class="inline-flex items-center px-4 py-2 rounded-full bg-pink-100 text-pink-700 mt-4">
+            <i class="fas fa-brain mr-2"></i>
+            <span>Powered by Convolutional Neural Networks (CNN)</span>
+        </div>
+    </div>
+
+
+        {% if not prediction_made %}
+        <!-- Upload Form -->
+        <div class="form-card">
+            <form method="POST" action="/image-prediction" enctype="multipart/form-data" id="imageForm">
+                <!-- Histopathology Information Box -->
+                <div class="histo-info-box">
+                    <h2 class="text-xl font-bold mb-4 flex items-center" style="color: var(--text-color);">
+                        <i class="fas fa-microscope mr-3 text-pink-500"></i>
+                        Image Specifications
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-image text-pink-600 dark:text-pink-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-sm" style="color: var(--text-color);">Image Type</h3>
+                            <p class="text-xs" style="color: var(--text-light);">Histopathology Biopsy</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-search-plus text-purple-600 dark:text-purple-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-sm" style="color: var(--text-color);">Magnification</h3>
+                            <p class="text-xs" style="color: var(--text-light);">400X</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-file-image text-blue-600 dark:text-blue-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-sm" style="color: var(--text-color);">Format</h3>
+                            <p class="text-xs" style="color: var(--text-light);">PNG Only</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-sliders-h text-green-600 dark:text-green-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-sm" style="color: var(--text-color);">Source</h3>
+                            <p class="text-xs" style="color: var(--text-light);">Microscopic Tissue Slide</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Upload -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4" style="color: var(--text-color);">
+                        <i class="fas fa-upload mr-2 text-pink-500"></i>
+                        Upload Histopathology Image
+                    </h2>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" name="image" id="imageInput" accept=".png" class="hidden" required>
+                        <i class="fas fa-cloud-upload-alt text-4xl mb-4" style="color: var(--primary-pink);"></i>
+                        <h3 class="text-xl font-semibold mb-2" style="color: var(--text-color);">Drag & Drop or Click to Upload</h3>
+                        <p class="text-sm mb-4" style="color: var(--text-light);">
+                            <strong>Supported format: PNG only</strong><br>
+                            Maximum file size: 10MB<br>
+                            <em>Only histopathology biopsy images at 400X magnification are supported</em>
+                        </p>
+                        <button type="button" onclick="document.getElementById('imageInput').click()" 
+                                class="btn-primary">
+                            <i class="fas fa-microscope mr-2"></i>
+                            Choose PNG File
+                        </button>
+                        <div id="fileName" class="upload-filename">
+                            <i class="fas fa-file-image mr-2"></i>
+                            <span id="fileNameText"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <img id="imagePreview" class="image-preview mx-auto">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="btn-primary px-8 py-3 text-lg">
+                        <i class="fas fa-search mr-2"></i>
+                        Analyze Histopathology Image
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Information Section -->
+        <div class="form-card mt-8">
+            <h2 class="text-2xl font-bold mb-6" style="color: var(--text-color);">
+                <i class="fas fa-info-circle mr-2 text-pink-500"></i>
+                How It Works
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-microscope text-blue-600 dark:text-blue-300 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2" style="color: var(--text-color);">Upload Histopathology Image</h3>
+                    <p class="text-sm" style="color: var(--text-light);">Upload your biopsy tissue slide image in PNG format</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-green-600 dark:text-green-300 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2" style="color: var(--text-color);">CNN Analysis</h3>
+                    <p class="text-sm" style="color: var(--text-light);">Our specialized CNN analyzes tissue patterns at cellular level</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-purple-600 dark:text-purple-300 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2" style="color: var(--text-color);">Get Results</h3>
+                    <p class="text-sm" style="color: var(--text-light);">Receive detailed analysis with confidence scores</p>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Results Section -->
+        <div class="form-card mb-8">
+            <h2 class="text-2xl font-bold mb-6" style="color: var(--text-color);">
+                <i class="fas fa-chart-line mr-2 text-pink-500"></i>
+                Analysis Results
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Image Preview -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" style="color: var(--text-color);">Uploaded Histopathology Image</h3>
+                    <img src="data:image/jpeg;base64,{{ image_data }}" alt="Analyzed Image" class="image-preview w-full rounded-lg shadow-lg" style="display: block;">
+                </div>
+                
+                <!-- Prediction Results -->
+                <div>
+                    <div class="result-card mb-6 {% if result == 'Malignant' %}malignant{% else %}benign{% endif %}">
+                        <h3 class="text-xl font-bold mb-4" style="color: var(--text-color);">Prediction Summary</h3>
+                        
+                        <div class="mb-4">
+                            <span class="text-3xl font-bold {% if result == 'Malignant' %}text-red-600{% else %}text-green-600{% endif %}">
+                                {{ result }}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span style="color: var(--text-light);">Benign: {{ "%.1f"|format(benign_prob) }}%</span>
+                                <span style="color: var(--text-light);">Malignant: {{ "%.1f"|format(malignant_prob) }}%</span>
+                            </div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill {% if result == 'Malignant' %}bg-red-500{% else %}bg-green-500{% endif %}" 
+                                     style="width: {{ confidence }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <p class="text-sm" style="color: var(--text-light);">
+                            Confidence: {{ "%.1f"|format(confidence) }}%
+                        </p>
+                    </div>
+                    
+                    <!-- Model Information -->
+                    <div class="model-info-box mb-6">
+                        <h4 class="font-semibold mb-2" style="color: var(--text-color);">
+                            <i class="fas fa-robot mr-2"></i>
+                            Model Information
+                        </h4>
+                        <p class="text-sm" style="color: var(--text-light);">
+                            Analysis performed using Convolutional Neural Network (CNN) trained on histopathology biopsy images (BreakHis dataset).
+                            This model specializes in detecting cellular patterns and abnormalities in microscopic tissue images at 400X magnification.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="form-card mb-8">
+            <h2 class="text-2xl font-bold mb-6" style="color: var(--text-color);">
+                <i class="fas fa-hand-holding-heart mr-2 text-pink-500"></i>
+                Recommendations
+            </h2>
+            
+            <div class="space-y-4">
+                {% for recommendation in recommendations %}
+                <div class="flex items-start">
+                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                    <span style="color: var(--text-color);">{{ recommendation }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Precautions -->
+        {% if precautions %}
+        <div class="form-card mb-8">
+            <h2 class="text-2xl font-bold mb-6" style="color: var(--text-color);">
+                <i class="fas fa-exclamation-triangle mr-2 text-yellow-500"></i>
+                Important Precautions
+            </h2>
+            
+            <div class="space-y-4">
+                {% for precaution in precautions %}
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-yellow-500 mt-1 mr-3"></i>
+                    <span style="color: var(--text-color);">{{ precaution }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="form-card text-center">
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="/image-prediction" class="btn-primary inline-flex items-center justify-center">
+                    <i class="fas fa-redo mr-2"></i>
+                    New Analysis
+                </a>
+                <a href="/common-page" class="btn-secondary inline-flex items-center justify-center" 
+                   style="background: transparent; color: var(--primary-pink); border: 2px solid var(--primary-pink);">
+                    <i class="fas fa-home mr-2"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+<footer class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white pt-16 pb-8 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+
+            <!-- Brand -->
+            <div>
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-ribbon text-white"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-gray-900 dark:text-white">BreastCareAI</span>
+                        <div class="text-xs text-gray-700 dark:text-gray-400 -mt-1">
+                            AI-Based Educational Risk Analysis Platform
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    BreastCareAI is an academic project demonstrating how machine learning
+                    and deep learning techniques can be applied to breast cancer-related
+                    data for educational and research purposes.
+                </p>
+
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-x-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">Quick Links</h3>
+                <ul class="space-y-3">
+                    <li><a href="/" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Home</a></li>
+                    <li><a href="#features" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Features</a></li>
+                    <li><a href="#how-it-works" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">How It Works</a></li>
+                    <li><a href="#symptoms" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Symptoms</a></li>
+                    <li><a href="#prevention" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Awareness</a></li>
+                    <li><a href="#about" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">About</a></li>
+                    <li><a href="#faq" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">FAQ</a></li>
+                </ul>
+            </div>
+
+            <!-- Services -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">System Modules</h3>
+                <ul class="space-y-3">
+                    <li class="text-gray-700 dark:text-gray-400">Data-Based Prediction</li>
+                    <li class="text-gray-700 dark:text-gray-400">Image-Based Analysis</li>
+                    <li class="text-gray-700 dark:text-gray-400">Symptoms Assessment</li>
+                    <li class="text-gray-700 dark:text-gray-400">Risk Visualization</li>
+                    <li class="text-gray-700 dark:text-gray-400">Report Generation</li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">Contact</h3>
+                <div class="space-y-3 text-gray-700 dark:text-gray-400">
+                    <p class="flex items-center">
+                        <i class="fas fa-envelope mr-3 text-pink-500"></i>
+                        breastcareai@gmail.com
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-3 text-pink-500"></i>
+                        Mumbai, India
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="border-t border-gray-300 dark:border-gray-800 pt-8 text-center">
+            <p class="text-gray-700 dark:text-gray-400 text-sm mb-2">
+                © 2025 BreastCareAI • Academic Project
+            </p>
+            <p class="text-gray-600 dark:text-gray-500 text-xs max-w-4xl mx-auto">
+                Disclaimer: BreastCareAI is an educational and research-based system.
+                It does not provide medical diagnosis, treatment, or professional healthcare advice.
+            </p>
+        </div>
+
+    </div>
+</footer>
+
+    <script>
+        // Theme toggle functionality
+        function initThemeToggle() {
+            const themeToggle = document.getElementById('navThemeToggle');
+            const themeIcon = document.getElementById('navThemeIcon');
+           
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme.matches ? 'dark' : 'light');
+           
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-moon';
+            }
+           
+            function toggleTheme() {
+                if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.className = 'fas fa-moon';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                }
+            }
+           
+            themeToggle.addEventListener('click', toggleTheme);
+        }
+
+        // Enhanced file upload functionality
+        function initFileUpload() {
+            const imageInput = document.getElementById('imageInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const uploadArea = document.getElementById('uploadArea');
+            const fileName = document.getElementById('fileName');
+            const fileNameText = document.getElementById('fileNameText');
+
+            // Validate file type
+            function validateFile(file) {
+                const validTypes = ['image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Error: Only PNG files are accepted. Please upload a PNG histopathology image.');
+                    imageInput.value = '';
+                    fileName.style.display = 'none';
+                    imagePreview.style.display = 'none';
+                    return false;
+                }
+                return true;
+            }
+
+            // Handle file selection
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && validateFile(file)) {
+                    fileNameText.textContent = file.name;
+                    fileName.style.display = 'flex';
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                uploadArea.classList.add('drag-over');
+            }
+
+            function unhighlight() {
+                uploadArea.classList.remove('drag-over');
+            }
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files[0] && validateFile(files[0])) {
+                    imageInput.files = files;
+                    fileNameText.textContent = files[0].name;
+                    fileName.style.display = 'flex';
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(files[0]);
+                }
+            }
+        }
+
+        // Initialize everything on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initThemeToggle();
+            initFileUpload();
+            
+            // Set username if available
+            const usernameElement = document.getElementById('usernameDisplay');
+            if (usernameElement && usernameElement.textContent === '{{ user.name }}') {
+                usernameElement.textContent = 'User';
+            }
+
+            // Animate confidence bars if results are shown
+            {% if prediction_made %}
+            setTimeout(() => {
+                const confidenceBar = document.querySelector('.confidence-fill');
+                if (confidenceBar) {
+                    const width = confidenceBar.style.width;
+                    confidenceBar.style.width = '0%';
+                    setTimeout(() => {
+                        confidenceBar.style.width = width;
+                    }, 100);
+                }
+            }, 500);
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

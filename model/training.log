@@ -1,0 +1,32 @@
+2025-09-11 19:21:09,971 - INFO - ==================================================
+2025-09-11 19:21:09,971 - INFO - STARTING MODEL TRAINING
+2025-09-11 19:21:09,971 - INFO - ==================================================
+2025-09-11 19:21:09,974 - INFO - Loading dataset...
+2025-09-11 19:21:10,005 - INFO - Dataset shape: (569, 9)
+2025-09-11 19:21:10,015 - INFO - Target distribution:
+diagnosis
+B    357
+M    212
+Name: count, dtype: int64
+2025-09-11 19:21:10,022 - INFO - Number of features: 8
+2025-09-11 19:21:10,022 - INFO - Scaling features...
+2025-09-11 19:21:10,033 - INFO - Splitting data...
+2025-09-11 19:21:10,038 - INFO - Training set: 398 samples
+2025-09-11 19:21:10,038 - INFO - Test set: 171 samples
+2025-09-11 19:21:10,038 - INFO - Training svm...
+2025-09-11 19:21:10,208 - INFO - svm - Accuracy: 0.9357, F1: 0.9134
+2025-09-11 19:21:10,208 - INFO - Training random_forest...
+2025-09-11 19:21:11,670 - INFO - random_forest - Accuracy: 0.9474, F1: 0.9291
+2025-09-11 19:21:11,670 - INFO - Training logistic_regression...
+2025-09-11 19:21:11,793 - INFO - logistic_regression - Accuracy: 0.9474, F1: 0.9291
+2025-09-11 19:21:11,794 - INFO - Creating visualizations...
+2025-09-11 19:21:17,411 - INFO - Saving results...
+2025-09-11 19:21:17,449 - INFO - Copied model_comparison.png to static folder
+2025-09-11 19:21:17,455 - INFO - Copied feature_analysis.png to static folder
+2025-09-11 19:21:17,458 - INFO - Copied confusion_matrices.png to static folder
+2025-09-11 19:21:17,458 - INFO - ==================================================
+2025-09-11 19:21:17,460 - INFO - TRAINING COMPLETED SUCCESSFULLY
+2025-09-11 19:21:17,460 - INFO - ==================================================
+2025-09-11 19:21:17,460 - INFO - Svm                  | Accuracy: 0.9357 | F1: 0.9134 | AUC: 0.9861
+2025-09-11 19:21:17,460 - INFO - Random Forest        | Accuracy: 0.9474 | F1: 0.9291 | AUC: 0.9855
+2025-09-11 19:21:17,460 - INFO - Logistic Regression  | Accuracy: 0.9474 | F1: 0.9291 | AUC: 0.9876

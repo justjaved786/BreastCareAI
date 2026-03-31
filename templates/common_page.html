@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BreastCare AI - Choose Prediction Type</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        :root {
+            --primary-pink: #e91e63;
+            --secondary-pink: #ad1457;
+            --accent-pink: #ec407a;
+            --gradient-purple: #8e24aa;
+            --light-pink: #f8bbd9;
+            --light-bg: #fce4ec;
+            --card-bg: #ffffff;
+            --text-dark: #212121;
+            --text-light: #757575;
+            --bg-white: #ffffff;
+            --bg-pink-100: #fce7f3;
+            --text-gray-800: #1f2937;
+            --text-gray-700: #374151;
+            --text-gray-600: #4b5563;
+            --text-gray-400: #9ca3af;
+            --text-color: #1f2937;
+        }
+       
+        [data-theme="dark"] {
+            --primary-pink: #f48fb1;
+            --secondary-pink: #ad1457;
+            --accent-pink: #f06292;
+            --light-pink: #4a1a2d;
+            --light-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-dark: #f5f5f5;
+            --text-light: #b0b0b0;
+            --bg-white: #2d2d2d;
+            --bg-pink-100: #4a1a2d;
+            --text-gray-800: #f5f5f5;
+            --text-gray-700: #e5e7eb;
+            --text-gray-600: #d1d5db;
+            --text-gray-400: #9ca3af;
+            --text-color: #ffffff;
+        }
+       
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+       
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+        }
+
+        /* Glass Morphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+       
+        [data-theme="dark"] .glass {
+            background: rgba(45, 45, 45, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+            color: var(--text-gray-700);
+        }
+       
+        [data-theme="dark"] .nav-link {
+            color: var(--text-gray-700);
+        }
+       
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            transition: width 0.3s ease;
+        }
+       
+        .nav-link:hover::after {
+            width: 100%;
+        }
+       
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+       
+        [data-theme="dark"] .theme-toggle {
+            color: var(--text-dark);
+        }
+       
+        .theme-toggle:hover {
+            background: rgba(233, 30, 99, 0.1);
+        }
+       
+        [data-theme="dark"] .theme-toggle:hover {
+            background: rgba(244, 143, 177, 0.1);
+        }
+
+        /* User Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--card-bg);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            z-index: 100;
+            overflow: hidden;
+            margin-top: 0.5rem;
+            border: 1px solid rgba(233, 30, 99, 0.1);
+        }
+
+        [data-theme="dark"] .dropdown-content {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border-color: rgba(244, 143, 177, 0.2);
+        }
+
+        .profile-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: var(--text-dark);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(233, 30, 99, 0.1);
+        }
+
+        [data-theme="dark"] .dropdown-content a:hover {
+            background-color: rgba(244, 143, 177, 0.1);
+        }
+
+        /* Cards Styling */
+        .prediction-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(233, 30, 99, 0.1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        [data-theme="dark"] .prediction-card {
+            border-color: rgba(244, 143, 177, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .prediction-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(233, 30, 99, 0.2);
+        }
+
+        [data-theme="dark"] .prediction-card:hover {
+            box-shadow: 0 25px 50px rgba(244, 143, 177, 0.3);
+        }
+
+        /* Card Blink Animation */
+        @keyframes blink {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                transform: translateY(0);
+            }
+            50% {
+                box-shadow: 0 15px 40px rgba(233, 30, 99, 0.4);
+                transform: translateY(-5px);
+            }
+        }
+
+        .prediction-card:hover {
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        /* Icon Hover Effect */
+        @keyframes iconPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.7);
+            }
+            70% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 15px rgba(233, 30, 99, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(233, 30, 99, 0);
+            }
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-icon:hover {
+            animation: iconPulse 1.5s infinite;
+        }
+
+        /* Specific icon colors for each card */
+        #data-prediction-card .card-icon {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        #image-prediction-card .card-icon {
+            background: linear-gradient(135deg, #10b981, #047857);
+        }
+
+        #symptoms-assessment-card .card-icon {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        /* Card glow effect when icon is hovered */
+        .icon-hover-glow {
+            animation: cardGlow 1.5s ease-in-out infinite !important;
+        }
+
+        @keyframes cardGlow {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                box-shadow: 0 15px 40px rgba(233, 30, 99, 0.4);
+            }
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: var(--text-dark);
+        }
+
+        .card-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .card-steps {
+            margin-bottom: 2rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .step-item i {
+            margin-right: 0.75rem;
+            color: var(--primary-pink);
+            font-size: 0.9rem;
+        }
+
+        .card-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .card-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 15px rgba(233, 30, 99, 0.4);
+            color: white;
+        }
+
+        .card-btn:hover::before {
+            left: 100%;
+        }
+
+        .card-btn:active {
+            transform: translateY(-1px) scale(1);
+        }
+
+        /* Badge Styling */
+        .card-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        /* Footer Styling */
+        .text-gray-800 { color: var(--text-gray-800); }
+        .text-gray-700 { color: var(--text-gray-700); }
+        .text-gray-600 { color: var(--text-gray-600); }
+        .text-gray-400 { color: var(--text-gray-400); }
+
+        [data-theme="dark"] .bg-white {
+            background-color: var(--bg-white);
+        }
+
+        /* Animation for cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Floating Dots Animation */
+        .floating-dots {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+       
+        .dot {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(233, 30, 99, 0.15);
+            animation: float 8s infinite ease-in-out;
+        }
+       
+        [data-theme="dark"] .dot {
+            background: rgba(244, 143, 177, 0.15);
+        }
+       
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0.5;
+            }
+            25% {
+                transform: translate(15px, 20px) rotate(5deg);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(10px, 35px) rotate(0deg);
+                opacity: 1;
+            }
+            75% {
+                transform: translate(20px, 15px) rotate(-5deg);
+                opacity: 0.8;
+            }
+        }
+
+        /* Visual Elements */
+        .visual-element {
+            position: absolute;
+            z-index: 1;
+            opacity: 0.7;
+        }
+
+        .circle-1 {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(233, 30, 99, 0.1);
+            top: 10%;
+            left: 10%;
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        .circle-2 {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(142, 36, 170, 0.1);
+            bottom: 10%;
+            right: 10%;
+            animation: pulse 5s infinite ease-in-out;
+        }
+
+        .square-1 {
+            width: 80px;
+            height: 80px;
+            background: rgba(236, 64, 122, 0.1);
+            top: 20%;
+            right: 15%;
+            transform: rotate(45deg);
+            animation: rotate 10s infinite linear;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Card Selection Animation */
+        @keyframes cardSelect {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                transform: scale(0.95);
+                box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        .card-selected {
+            animation: cardSelect 0.5s ease forwards;
+        }
+
+        /* Fade Out Animation */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(233, 30, 99, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-pink);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Professional Animations */
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease forwards;
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.8s ease forwards;
+            opacity: 0;
+            transform: translateX(50px);
+        }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--card-bg);
+            color: var(--text-dark);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            border-left: 4px solid var(--primary-pink);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 6px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            width: 0%;
+            transition: width 0.5s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(233, 30, 99, 0.3);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* NEW: Step-by-step sections */
+        .prediction-section {
+            margin-bottom: 5rem;
+            position: relative;
+            padding: 4rem 0;
+            border-bottom: 3px dashed rgba(233, 30, 99, 0.2);
+        }
+
+        .prediction-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-content {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            position: relative;
+        }
+
+        .section-card {
+            flex: 1;
+            transition: all 0.5s ease;
+        }
+
+        .section-steps {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(233, 30, 99, 0.1);
+            position: relative;
+            overflow: hidden;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .section-card:hover + .section-steps,
+        .section-steps:hover {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .section-steps h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            text-align: center;
+        }
+
+        .section-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(233, 30, 99, 0.1);
+        }
+
+        .section-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .step-number-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3);
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .step-content p {
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Section animations */
+        .section-animation {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .section-animation.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.6);
+        }
+
+        /* NEW: AJAX Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .loading-spinner-large {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(233, 30, 99, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-pink);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .loading-subtext {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* NEW: Enhanced Toast System */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast-enhanced {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 320px;
+            max-width: 420px;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 4px solid;
+        }
+
+        .toast-enhanced.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-enhanced.success {
+            border-left-color: #10b981;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        }
+
+        .toast-enhanced.error {
+            border-left-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        }
+
+        .toast-enhanced.info {
+            border-left-color: #3b82f6;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        }
+
+        .toast-enhanced.warning {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .toast-enhanced.success .toast-icon {
+            background: #10b981;
+        }
+
+        .toast-enhanced.error .toast-icon {
+            background: #ef4444;
+        }
+
+        .toast-enhanced.info .toast-icon {
+            background: #3b82f6;
+        }
+
+        .toast-enhanced.warning .toast-icon {
+            background: #f59e0b;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .toast-close:hover {
+            color: #374151;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .toast-enhanced {
+            background: #374151;
+            color: white;
+        }
+
+        [data-theme="dark"] .toast-enhanced.success {
+            background: linear-gradient(135deg, #064e3b, #047857);
+        }
+
+        [data-theme="dark"] .toast-enhanced.error {
+            background: linear-gradient(135deg, #7f1d1d, #dc2626);
+        }
+
+        [data-theme="dark"] .toast-enhanced.info {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        }
+
+        [data-theme="dark"] .toast-enhanced.warning {
+            background: linear-gradient(135deg, #78350f, #d97706);
+        }
+
+        [data-theme="dark"] .toast-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* NEW: Button loading state */
+        .btn-loading {
+            pointer-events: none;
+            position: relative;
+            color: transparent !important;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* NEW: Professional cursor during loading */
+        .professional-cursor {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23e91e63' opacity='0.8'/%3E%3Ccircle cx='16' cy='16' r='6' fill='white'/%3E%3C/svg%3E") 16 16, auto !important;
+        }
+
+        /* NEW: Card Step Indicators */
+        .card-step-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            background: var(--primary-pink);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            z-index: 2;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+
+        .prediction-card:hover .card-step-indicator {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* NEW: Feature Status Indicators */
+        .feature-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .status-beta {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .status-new {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+
+        /* NEW: Fixed Navbar Layout */
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 2rem;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-button {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* NEW: Social Media Colors - Fixed with original brand colors */
+        .social-x { color: #000000 !important; }
+        .social-facebook { color: #1877F2 !important; }
+        .social-whatsapp { color: #25D366 !important; }
+        .social-instagram { color: #E4405F !important; }
+        .social-linkedin { color: #0A66C2 !important; }
+        .social-youtube { color: #FF0000 !important; }
+
+        [data-theme="dark"] .social-x { color: #ffffff !important; }
+        [data-theme="dark"] .social-facebook { color: #1877F2 !important; }
+        [data-theme="dark"] .social-whatsapp { color: #25D366 !important; }
+        [data-theme="dark"] .social-instagram { color: #E4405F !important; }
+        [data-theme="dark"] .social-linkedin { color: #0A66C2 !important; }
+        [data-theme="dark"] .social-youtube { color: #FF0000 !important; }
+
+        /* NEW: Pink Gradient Section Boundaries */
+        .section-gradient-border {
+            position: relative;
+            padding: 4rem 0;
+            margin-bottom: 5rem;
+        }
+
+        .section-gradient-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--gradient-purple));
+            border-radius: 2px;
+        }
+
+        .section-gradient-border::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--gradient-purple));
+            opacity: 0.5;
+            border-radius: 1px;
+        }
+
+        /* NEW: Enhanced Horizontal Separator Line */
+        .section-separator {
+            position: relative;
+            margin: 4rem 0;
+            text-align: center;
+        }
+
+        .section-separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--primary-pink) 20%, 
+                var(--gradient-purple) 50%, 
+                var(--primary-pink) 80%, 
+                transparent 100%);
+            z-index: 1;
+        }
+
+        .section-separator-text {
+            display: inline-block;
+            background: var(--light-bg);
+            padding: 0 2rem;
+            color: var(--primary-pink);
+            font-weight: 600;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        [data-theme="dark"] .section-separator-text {
+            background: var(--light-bg);
+        }
+
+        /* NEW: Choose Prediction Method Section Enhancement */
+        .prediction-method-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .prediction-method-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--gradient-purple));
+            border-radius: 2px;
+        }
+
+        .prediction-method-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--gradient-purple));
+            opacity: 0.5;
+            border-radius: 1px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .prediction-card {
+                padding: 1.5rem;
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+            }
+
+            .section-content {
+                flex-direction: column;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .section-steps {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            .scroll-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .toast-enhanced {
+                min-width: 280px;
+                max-width: 320px;
+            }
+
+            .toast-container {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+            }
+
+            /* Mobile navbar adjustments */
+            .nav-container {
+                padding: 0 1rem;
+            }
+            
+            .nav-center {
+                display: none;
+            }
+            
+            .mobile-menu-button {
+                display: block;
+            }
+            
+            .nav-right {
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .nav-center {
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Enhanced Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- AJAX Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner-large"></div>
+            <div class="loading-text" id="loadingText">Processing Your Request</div>
+            <div class="loading-subtext" id="loadingSubtext">Please wait while we prepare your prediction...</div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-chevron-up"></i>
+    </div>
+
+    <!-- Navigation - Fixed Layout -->
+    <nav class="glass sticky top-0 z-50 py-4 bg-white/80 backdrop-blur-md">
+        <div class="nav-container">
+            <!-- Left: Logo and Title -->
+            <div class="nav-left">
+                <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-ribbon text-white"></i>
+                </div>
+                <span class="text-xl font-bold" style="color: var(--text-color, #1f2937);">
+                    BreastCare<span style="color: #ec4899;">AI</span>
+                </span>
+            </div>
+           
+            <!-- Center: Navigation Links -->
+<div class="nav-center hidden md:flex">
+    <a href="/welcome" class="nav-link font-medium">Home</a>
+    <a href="#data-prediction-section" class="nav-link font-medium">Data Analysis</a>
+    <a href="#image-prediction-section" class="nav-link font-medium">Image Analysis</a>
+    <a href="#symptoms-assessment-section" class="nav-link font-medium">Symptoms Analysis</a>
+</div>
+
+           
+            <!-- Right: Theme Toggle -->
+            <div class="nav-right">
+                <button id="navThemeToggle" class="theme-toggle">
+                    <i class="fas fa-moon" id="navThemeIcon"></i>
+                </button>
+                
+                <!-- Mobile menu button -->
+                <button class="mobile-menu-button md:hidden">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Dots Background -->
+    <div class="floating-dots" id="floatingDots"></div>
+    
+    <!-- Visual Elements -->
+    <div class="visual-element circle-1"></div>
+    <div class="visual-element circle-2"></div>
+    <div class="visual-element square-1"></div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-12 flex-grow">
+        <!-- Welcome Section -->
+<div class="text-center mb-12 fade-in-up">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: var(--text-color);">
+        Welcome to BreastCareAI
+    </h1>
+
+    <p class="text-lg md:text-xl mb-6" style="color: var(--text-light);">
+        An AI-based platform for breast cancer risk analysis using data, symptoms,
+        and medical images for educational purposes.
+    </p>
+
+    <div class="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-full inline-block shadow-lg">
+        <i class="fas fa-brain mr-2"></i>
+        Educational • AI-Based • Research-Oriented
+    </div>
+</div>
+
+
+        <!-- Quick Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 fade-in-up">
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg border border-pink-100 dark:border-pink-900">
+        <div class="text-3xl font-bold text-pink-600 mb-2">3</div>
+        <div class="text-gray-600 dark:text-gray-400">
+            AI Analysis Modules
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg border border-pink-100 dark:border-pink-900">
+        <div class="text-3xl font-bold text-pink-600 mb-2">ML + DL</div>
+        <div class="text-gray-600 dark:text-gray-400">
+            Techniques Used
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg border border-pink-100 dark:border-pink-900">
+        <div class="text-3xl font-bold text-pink-600 mb-2">Secure</div>
+        <div class="text-gray-600 dark:text-gray-400">
+            User Account Access
+        </div>
+    </div>
+
+</div>
+
+
+        <!-- Enhanced Prediction Methods Section -->
+<div class="prediction-method-header">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4" style="color: var(--text-color);">
+        Select Analysis Method
+    </h2>
+    <p class="text-lg md:text-xl" style="color: var(--text-light);">
+        Choose an AI-based analysis module to explore breast cancer risk assessment
+    </p>
+</div>
+
+
+        <!-- NEW: Step-by-step Sections with Gradient Borders -->
+        
+        <!-- Data-Based Analysis Section -->
+<div class="section-gradient-border" id="data-prediction-section">
+    <div class="section-header">
+        <h2>Data-Based Analysis</h2>
+        <p>
+            Analyze structured numerical inputs using machine learning models
+            to estimate breast cancer risk for educational purposes.
+        </p>
+    </div>
+
+    <div class="section-content">
+        <div class="section-card">
+            <div class="prediction-card fade-in-up" id="data-prediction-card" style="animation-delay: 0.1s;">
+                <div class="card-step-indicator">1</div>
+
+                <div class="card-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+
+                <h3 class="card-title">Data-Based Analysis</h3>
+
+                <p class="card-description">
+                    This module evaluates structured numerical data using supervised
+                    machine learning models to provide a probabilistic risk indication.
+                </p>
+                
+                <div class="card-steps">
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Enter relevant numerical inputs</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>AI models analyze statistical patterns</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>View risk analysis summary</span>
+                    </div>
+                </div>
+                
+                <button class="card-btn" data-card="data-prediction-card" data-url="/data-prediction">
+                    <i class="fas fa-magic mr-2"></i>
+                    Start Data Analysis
+                </button>
+                
+                <div class="feature-status status-active">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Models Loaded & Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Process -->
+        <div class="section-steps section-animation">
+            <h3>Step-by-Step Process</h3>
+
+            <div class="section-step">
+                <div class="step-number-circle">1</div>
+                <div class="step-content">
+                    <h4>Enter Numerical Data</h4>
+                    <p>
+                        Provide structured numerical values required by the machine
+                        learning models, such as age and clinical measurements.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">2</div>
+                <div class="step-content">
+                    <h4>Select Analysis Model</h4>
+                    <p>
+                        Choose one of the available supervised learning models
+                        (SVM, Random Forest, or Logistic Regression).
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">3</div>
+                <div class="step-content">
+                    <h4>Model Processing</h4>
+                    <p>
+                        The selected machine learning model processes the input
+                        data to identify patterns associated with different risk levels.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">4</div>
+                <div class="step-content">
+                    <h4>View Results & Report</h4>
+                    <p>
+                        Review the generated risk analysis results along with
+                        confidence scores and a downloadable summary report.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Enhanced Horizontal Separator -->
+<div class="section-separator">
+    <span class="section-separator-text">Next Analysis Module</span>
+</div>
+
+
+        <!-- Image-Based Analysis Section -->
+<div class="section-gradient-border" id="image-prediction-section">
+    <div class="section-header">
+        <h2>Image-Based Analysis</h2>
+        <p>
+            Analyze histopathology images using a convolutional neural network (CNN)
+            to estimate breast cancer risk for educational purposes.
+        </p>
+    </div>
+
+    <div class="section-content">
+
+        <!-- Step-by-Step Process -->
+        <div class="section-steps section-animation">
+            <h3>Step-by-Step Process</h3>
+
+            <div class="section-step">
+                <div class="step-number-circle">1</div>
+                <div class="step-content">
+                    <h4>Upload Histopathology Image</h4>
+                    <p>
+                        Upload a supported histopathology image in PNG format
+                        from a microscope slide sample.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">2</div>
+                <div class="step-content">
+                    <h4>Image Preprocessing</h4>
+                    <p>
+                        The image is resized and normalized to match the input
+                        requirements of the trained CNN model.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">3</div>
+                <div class="step-content">
+                    <h4>CNN-Based Feature Extraction</h4>
+                    <p>
+                        The convolutional neural network extracts visual features
+                        related to tissue structure and cellular patterns.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">4</div>
+                <div class="step-content">
+                    <h4>Risk Classification Output</h4>
+                    <p>
+                        The model outputs a probabilistic classification
+                        indicating benign or malignant tissue patterns.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card -->
+        <div class="section-card">
+            <div class="prediction-card fade-in-up" id="image-prediction-card" style="animation-delay: 0.2s;">
+                <div class="card-step-indicator">2</div>
+
+                <div class="card-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+
+                <h3 class="card-title">Image-Based Analysis</h3>
+
+                <p class="card-description">
+                    This module uses a trained convolutional neural network to analyze
+                    histopathology images and provide a binary risk classification.
+                </p>
+                
+                <div class="card-steps">
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Upload histopathology image (PNG)</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>CNN extracts visual patterns</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>View classification result</span>
+                    </div>
+                </div>
+                
+                <button class="card-btn" data-card="image-prediction-card" data-url="/image-prediction">
+                    <i class="fas fa-camera mr-2"></i>
+                    Start Image Analysis
+                </button>
+                
+                <div class="feature-status status-active">
+                    <i class="fas fa-check-circle"></i>
+                    <span>CNN Model Loaded</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Enhanced Horizontal Separator -->
+<div class="section-separator">
+    <span class="section-separator-text">Final Analysis Module</span>
+</div>
+
+
+        <!-- Symptoms-Based Analysis Section -->
+<div class="section-gradient-border" id="symptoms-assessment-section">
+    <div class="section-header">
+        <h2>Symptoms-Based Analysis</h2>
+        <p>
+            Explore potential breast cancer risk indicators using a structured
+            questionnaire focused on symptoms, family history, and lifestyle factors.
+        </p>
+    </div>
+
+    <div class="section-content">
+
+        <!-- Card -->
+        <div class="section-card">
+            <div class="prediction-card fade-in-up" id="symptoms-assessment-card" style="animation-delay: 0.3s;">
+                <div class="card-step-indicator">3</div>
+
+                <div class="card-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+
+                <h3 class="card-title">Symptoms-Based Analysis</h3>
+
+                <p class="card-description">
+                    This module uses a guided questionnaire to analyze responses
+                    and provide an educational risk indication based on predefined rules.
+                </p>
+                
+                <div class="card-steps">
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Answer structured questions</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>System evaluates response patterns</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>View risk indication summary</span>
+                    </div>
+                </div>
+                
+                <button class="card-btn" data-card="symptoms-assessment-card" data-url="/symptoms-assessment">
+                    <i class="fas fa-clipboard-list mr-2"></i>
+                    Start Questionnaire
+                </button>
+                
+                <div class="feature-status status-active">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Questionnaire Module Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step-by-Step -->
+        <div class="section-steps section-animation">
+            <h3>Step-by-Step Process</h3>
+
+            <div class="section-step">
+                <div class="step-number-circle">1</div>
+                <div class="step-content">
+                    <h4>Complete Questionnaire</h4>
+                    <p>
+                        Answer a set of structured questions related to symptoms,
+                        family history, and lifestyle characteristics.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">2</div>
+                <div class="step-content">
+                    <h4>Response Evaluation</h4>
+                    <p>
+                        The system evaluates responses using predefined scoring
+                        logic and rule-based analysis.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">3</div>
+                <div class="step-content">
+                    <h4>Risk Indication Output</h4>
+                    <p>
+                        A summarized risk indication is generated based on
+                        the overall response pattern.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-step">
+                <div class="step-number-circle">4</div>
+                <div class="step-content">
+                    <h4>Awareness Guidance</h4>
+                    <p>
+                        The results are intended to improve awareness and encourage
+                        consultation with healthcare professionals when appropriate.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner"></div>
+    </div>
+
+    <!-- Footer -->
+<footer class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white pt-16 pb-8 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+
+            <!-- Brand -->
+            <div>
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-ribbon text-white"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-gray-900 dark:text-white">BreastCareAI</span>
+                        <div class="text-xs text-gray-700 dark:text-gray-400 -mt-1">
+                            AI-Based Educational Risk Analysis Platform
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    BreastCareAI is an academic project demonstrating how machine learning
+                    and deep learning techniques can be applied to breast cancer-related
+                    data for educational and research purposes.
+                </p>
+
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-x-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">Quick Links</h3>
+                <ul class="space-y-3">
+                    <li><a href="/" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Home</a></li>
+                    <li><a href="#features" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Features</a></li>
+                    <li><a href="#how-it-works" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">How It Works</a></li>
+                    <li><a href="#symptoms" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Symptoms</a></li>
+                    <li><a href="#prevention" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Awareness</a></li>
+                    <li><a href="#about" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">About</a></li>
+                    <li><a href="#faq" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">FAQ</a></li>
+                </ul>
+            </div>
+
+            <!-- Services -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">System Modules</h3>
+                <ul class="space-y-3">
+                    <li class="text-gray-700 dark:text-gray-400">Data-Based Prediction</li>
+                    <li class="text-gray-700 dark:text-gray-400">Image-Based Analysis</li>
+                    <li class="text-gray-700 dark:text-gray-400">Symptoms Assessment</li>
+                    <li class="text-gray-700 dark:text-gray-400">Risk Visualization</li>
+                    <li class="text-gray-700 dark:text-gray-400">Report Generation</li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">Contact</h3>
+                <div class="space-y-3 text-gray-700 dark:text-gray-400">
+                    <p class="flex items-center">
+                        <i class="fas fa-envelope mr-3 text-pink-500"></i>
+                        breastcareai@gmail.com
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-3 text-pink-500"></i>
+                        Mumbai, India
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="border-t border-gray-300 dark:border-gray-800 pt-8 text-center">
+            <p class="text-gray-700 dark:text-gray-400 text-sm mb-2">
+                © 2025 BreastCareAI • Academic Project
+            </p>
+            <p class="text-gray-600 dark:text-gray-500 text-xs max-w-4xl mx-auto">
+                Disclaimer: BreastCareAI is an educational and research-based system.
+                It does not provide medical diagnosis, treatment, or professional healthcare advice.
+            </p>
+        </div>
+
+    </div>
+</footer>
+
+    <script>
+        // =============================================
+        // ONE-TIME DASHBOARD TOAST SYSTEM
+        // =============================================
+
+        // Toast Manager for Dashboard
+        class DashboardToastManager {
+            constructor() {
+                this.STORAGE_KEY = 'dashboard_toast';
+                this.SESSION_KEY = 'dashboard_toast_seen';
+                this.REFERER_KEY = 'dashboard_referer';
+            }
+
+            // Store toast data when navigating from Welcome page
+            storeWelcomeToast() {
+                const payload = {
+                    message: "Welcome to your Dashboard! Ready to start your health assessment?",
+                    source: "welcome_redirect",
+                    once: true,
+                    timestamp: Date.now(),
+                    id: 'dashboard_toast_' + Date.now()
+                };
+                
+                // Also store the referer to verify it came from welcome page
+                sessionStorage.setItem(this.REFERER_KEY, document.referrer || '');
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(payload));
+                
+                return true;
+            }
+
+            // Check and show toast if conditions are met
+            checkAndShowToast() {
+                // Get stored toast
+                const raw = localStorage.getItem(this.STORAGE_KEY);
+                if (!raw) return false;
+
+                let payload;
+                try {
+                    payload = JSON.parse(raw);
+                } catch {
+                    this.clearToast();
+                    return false;
+                }
+
+                // Get referer info
+                const referer = sessionStorage.getItem(this.REFERER_KEY) || '';
+                const isFromWelcome = referer.includes('/welcome') || 
+                                      document.referrer.includes('/welcome') ||
+                                      sessionStorage.getItem('came_from_welcome') === 'true';
+
+                // Check if toast has already been seen in this session
+                const hasSeenToast = sessionStorage.getItem(this.SESSION_KEY) === 'true';
+
+                // STRICT CONDITIONS for showing toast:
+                // 1. Must come from Welcome page
+                // 2. Must be marked as "once" 
+                // 3. Must not have been seen in this session
+                // 4. Payload must be valid
+                if (isFromWelcome && 
+                    payload.once === true && 
+                    !hasSeenToast &&
+                    payload.source === 'welcome_redirect') {
+                    
+                    // Show the toast
+                    this.showDashboardToast(payload.message);
+                    
+                    // Mark as seen
+                    sessionStorage.setItem(this.SESSION_KEY, 'true');
+                    
+                    // Clear the stored toast
+                    this.clearToast();
+                    
+                    // Clear referer tracking
+                    sessionStorage.removeItem(this.REFERER_KEY);
+                    sessionStorage.removeItem('came_from_welcome');
+                    
+                    return true;
+                }
+                
+                return false;
+            }
+
+            showDashboardToast(message) {
+                showToast('success', 'Welcome to Dashboard', message, 4000);
+            }
+
+            clearToast() {
+                localStorage.removeItem(this.STORAGE_KEY);
+            }
+
+            // Call this on Welcome page when user clicks "Go to Dashboard"
+            prepareDashboardRedirect() {
+                // Mark that we're coming from welcome page
+                sessionStorage.setItem('came_from_welcome', 'true');
+                this.storeWelcomeToast();
+            }
+        }
+
+        // Initialize toast manager
+        const dashboardToastManager = new DashboardToastManager();
+
+        // =============================================
+        // ENHANCED: Professional Toast Notification System
+        // =============================================
+        function showToast(type, title, message, duration = 5000) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-enhanced ${type}`;
+            
+            const icons = {
+                success: 'fas fa-check',
+                error: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle',
+                warning: 'fas fa-exclamation'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="${icons[type]}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Trigger animation with slight delay for better UX
+            setTimeout(() => toast.classList.add('show'), 150);
+            
+            // Auto remove after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 500);
+                    }
+                }, duration);
+            }
+            
+            return toast;
+        }
+
+        // =============================================
+        // NEW: AJAX Navigation Handler
+        // =============================================
+        function handleNavigation(url, cardId) {
+            const card = document.getElementById(cardId);
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            const loadingSubtext = document.getElementById('loadingSubtext');
+            
+            if (!card || !loadingOverlay) return;
+            
+            // Show loading state
+            card.classList.add('fade-out');
+            loadingOverlay.classList.add('active');
+            document.body.classList.add('professional-cursor');
+            
+            // Update loading text based on the section
+const sectionTitles = {
+    'data-prediction-card': 'Preparing Data Analysis',
+    'image-prediction-card': 'Loading Image Analysis',
+    'symptoms-assessment-card': 'Setting Up Questionnaire'
+};
+
+const sectionSubtitles = {
+    'data-prediction-card': 'Loading machine learning models and preparing the data analysis interface...',
+    'image-prediction-card': 'Initializing convolutional neural network and image preprocessing...',
+    'symptoms-assessment-card': 'Preparing structured questions and response evaluation logic...'
+};
+
+loadingText.textContent = sectionTitles[cardId] || 'Processing Request';
+loadingSubtext.textContent = sectionSubtitles[cardId] || 'Please wait while the system prepares the analysis module...';
+
+            
+            // Show progress bar
+            updateProgressBar();
+            
+            // Simulate loading delay for better UX
+            setTimeout(() => {
+                window.location.href = url;
+            }, 2000);
+        }
+
+        // =============================================
+        // Create floating dots
+        // =============================================
+        function createFloatingDots() {
+            const container = document.getElementById('floatingDots');
+            const dotCount = 15;
+           
+            for (let i = 0; i < dotCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+               
+                // Random size between 5px and 25px
+                const size = Math.random() * 20 + 5;
+                dot.style.width = `${size}px`;
+                dot.style.height = `${size}px`;
+               
+                // Random position
+                dot.style.left = `${Math.random() * 100}%`;
+                dot.style.top = `${Math.random() * 100}%`;
+               
+                // Random animation delay
+                dot.style.animationDelay = `${Math.random() * 8}s`;
+               
+                // Random opacity
+                dot.style.opacity = Math.random() * 0.5 + 0.2;
+               
+                container.appendChild(dot);
+            }
+        }
+
+        // =============================================
+        // Theme toggle functionality
+        // =============================================
+        function initThemeToggle() {
+            const themeToggle = document.getElementById('navThemeToggle');
+            const themeIcon = document.getElementById('navThemeIcon');
+           
+            // Check for saved theme preference or use preferred color scheme
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme.matches ? 'dark' : 'light');
+           
+            // Set the theme
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-moon';
+            }
+           
+            // Toggle theme function
+            function toggleTheme() {
+                if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.className = 'fas fa-moon';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                }
+            }
+           
+            // Add event listener
+            themeToggle.addEventListener('click', toggleTheme);
+        }
+
+        // =============================================
+        // Card animations and steps visualization
+        // =============================================
+        function initCardAnimations() {
+            const cardButtons = document.querySelectorAll('.card-btn[data-url]');
+            
+            // Add hover event to card icons to trigger card glow
+            $('.card-icon').hover(
+                function() {
+                    const card = $(this).closest('.prediction-card');
+                    card.addClass('icon-hover-glow');
+                },
+                function() {
+                    const card = $(this).closest('.prediction-card');
+                    card.removeClass('icon-hover-glow');
+                }
+            );
+            
+            // Add click event to card buttons
+            cardButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const cardId = this.getAttribute('data-card');
+                    const url = this.getAttribute('data-url');
+                    
+                    handleNavigation(url, cardId);
+                });
+            });
+        }
+
+        // =============================================
+        // Update progress bar
+        // =============================================
+        function updateProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            let width = 0;
+            
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                } else {
+                    width += 10;
+                    progressBar.style.width = width + '%';
+                }
+            }, 200);
+        }
+
+        // =============================================
+        // Scroll animations for sections
+        // =============================================
+        function initScrollAnimations() {
+            const sections = document.querySelectorAll('.section-animation');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+            
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        // =============================================
+        // Scroll to top functionality
+        // =============================================
+        function initScrollToTop() {
+            const scrollToTopBtn = document.getElementById('scrollToTop');
+            
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    scrollToTopBtn.classList.add('visible');
+                } else {
+                    scrollToTopBtn.classList.remove('visible');
+                }
+            });
+            
+            scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // =============================================
+        // Smooth scrolling for navigation links
+        // =============================================
+        function initSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+
+        // =============================================
+        // Clear any old toast data on page load
+        // =============================================
+        function clearLegacyData() {
+            // Clear old localStorage items that might cause issues
+            const legacyKeys = [
+                'toastPayload',
+                'toastMessage',
+                'redirectMessage'
+            ];
+            
+            legacyKeys.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                }
+            });
+        }
+
+        // =============================================
+        // Initialize everything on page load
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Clear any legacy data first
+            clearLegacyData();
+            
+            // Initialize all components
+            createFloatingDots();
+            initThemeToggle();
+            initCardAnimations();
+            initScrollAnimations();
+            initScrollToTop();
+            initSmoothScrolling();
+            
+            // Set username if available
+            const usernameElement = document.getElementById('usernameDisplay');
+            if (usernameElement && usernameElement.textContent === '{{ user.name if user else 'User' }}') {
+                // If the template variable isn't replaced, set a default
+                usernameElement.textContent = 'User';
+            }
+            
+            // Add staggered animations to cards
+            const cards = document.querySelectorAll('.prediction-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // ✅ Check and show dashboard toast (ONLY if coming from Welcome)
+            dashboardToastManager.checkAndShowToast();
+        });
+
+        // =============================================
+        // GLOBAL FUNCTION: Call this from Welcome page
+        // =============================================
+        window.prepareDashboardToast = function() {
+            dashboardToastManager.prepareDashboardRedirect();
+            return true;
+        };
+    </script>
+</body>
+</html>

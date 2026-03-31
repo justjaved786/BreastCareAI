@@ -1,0 +1,2613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prediction Results - BreastCare AI</title>
+  
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-pink: #e91e63;
+      --secondary-pink: #ad1457;
+      --accent-pink: #ec407a;
+      --gradient-purple: #8e24aa;
+      --light-pink: #f8bbd9;
+      --light-bg: #f9fafb;
+      --card-bg: #ffffff;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-white: #ffffff;
+      --bg-pink-100: #fce7f3;
+      --text-gray-800: #1f2937;
+      --text-gray-700: #374151;
+      --text-gray-600: #4b5563;
+      --text-gray-400: #9ca3af;
+      --text-color: #1f2937;
+    }
+   
+    [data-theme="dark"] {
+      --primary-pink: #f48fb1;
+      --secondary-pink: #ad1457;
+      --accent-pink: #f06292;
+      --light-pink: #4a1a2d;
+      --light-bg: #1a1a1a;
+      --card-bg: #2d2d2d;
+      --text-dark: #f5f5f5;
+      --text-light: #b0b0b0;
+      --bg-white: #2d2d2d;
+      --bg-pink-100: #4a1a2d;
+      --text-gray-800: #f5f5f5;
+      --text-gray-700: #e5e7eb;
+      --text-gray-600: #d1d5db;
+      --text-gray-400: #9ca3af;
+      --text-color: #ffffff;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-dark);
+      overflow-x: hidden;
+      transition: background-color 0.5s ease, color 0.5s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+   
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+    }
+
+    /* Glass Morphism Effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+   
+    [data-theme="dark"] .glass {
+      background: rgba(45, 45, 45, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Navigation - MATCHING COMMON PAGE */
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0 2rem;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    .nav-link {
+      position: relative;
+      transition: all 0.3s ease;
+      color: var(--text-gray-700);
+      text-decoration: none;
+      font-weight: 500;
+    }
+   
+    [data-theme="dark"] .nav-link {
+      color: var(--text-gray-700);
+    }
+   
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+      transition: width 0.3s ease;
+    }
+   
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      color: var(--text-dark);
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+   
+    [data-theme="dark"] .theme-toggle {
+      color: var(--text-dark);
+    }
+   
+    .theme-toggle:hover {
+      background: rgba(233, 30, 99, 0.1);
+    }
+   
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(244, 143, 177, 0.1);
+    }
+
+    /* Mobile menu button */
+    .mobile-menu-button {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-dark);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Cards Styling */
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2.5rem;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(233, 30, 99, 0.1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    [data-theme="dark"] .card {
+      border-color: rgba(244, 143, 177, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 50px rgba(233, 30, 99, 0.2);
+    }
+
+    [data-theme="dark"] .card:hover {
+      box-shadow: 0 25px 50px rgba(244, 143, 177, 0.3);
+    }
+
+    /* Primary Button - Consistent with Prediction Page */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      font-size: 1rem;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 15px rgba(233, 30, 99, 0.4);
+      color: white;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px) scale(1);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary:disabled:hover::before {
+      left: -100%;
+    }
+
+    /* Secondary Button */
+    .btn-secondary {
+      background: #64748b;
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 4px 6px rgba(100, 116, 139, 0.25);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+      transform: translateY(-2px);
+    }
+
+    /* Button Pulse Animation */
+    .btn-pulse {
+      animation: button-pulse 0.5s ease-in-out;
+    }
+
+    @keyframes button-pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 8px 15px rgba(233, 30, 99, 0.4);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+      }
+    }
+
+    /* Progress Bar - Consistent with Prediction Page */
+    .progress-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1rem 0;
+      border: 1px solid rgba(233, 30, 99, 0.1);
+    }
+
+    [data-theme="dark"] .progress-bar {
+      background: #475569;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-pink), var(--secondary-pink));
+      width: 0%;
+      transition: width 1s ease-in-out;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 20px 20px;
+      animation: move 1s linear infinite;
+    }
+
+    @keyframes move {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 20px 0;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .slide-in-left {
+      animation: slideInLeft 0.8s ease-out forwards;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 6rem auto 2rem;
+      padding: 1rem;
+      flex: 1 0 auto;
+      overflow: hidden;
+    }
+    
+    /* Result Card */
+    .result-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.6s ease-out forwards;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(233, 30, 99, 0.1);
+    }
+    
+    .result-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .title {
+      text-align: center;
+      color: var(--primary-pink);
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      transition: color 0.3s ease;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: var(--text-light);
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.8s ease-out 0.2s forwards;
+      opacity: 0;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-pink);
+      margin: 1.5rem 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: slideInLeft 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    
+    .results-grid, .visualization-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    
+    .model-card, .visualization-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--primary-pink);
+      animation: fadeInUp 0.6s ease-out 0.2s forwards;
+      opacity: 0;
+    }
+    
+    .model-card:hover, .visualization-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .model-card h4 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--primary-pink);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s ease;
+    }
+    
+    .model-metrics {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      line-height: 1.6;
+      transition: color 0.3s ease;
+    }
+    
+    .metric-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      padding: 0.25rem 0;
+      transition: transform 0.3s ease;
+    }
+    
+    .metric-label {
+      font-weight: 500;
+    }
+    
+    .metric-value {
+      font-weight: 600;
+    }
+    
+    .confidence-badge, .prediction-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    
+    .confidence-high {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    
+    .confidence-medium {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    .confidence-low {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .prediction-malignant {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .prediction-benign {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .confidence-badge:hover, .prediction-badge:hover {
+      transform: scale(1.05);
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 220px;
+      margin-top: 1rem;
+      transition: opacity 0.3s ease;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+    
+    .alert-warning {
+      background: #fee2e2;
+      color: #dc2626;
+      border-left: 4px solid #dc2626;
+    }
+
+    [data-theme="dark"] .alert-warning {
+      background: #4b1b1b;
+      color: #f87171;
+      border-left-color: #f87171;
+    }
+    
+    .precaution-list {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      animation: fadeInUp 0.6s ease-out 0.2s forwards;
+      opacity: 0;
+    }
+    
+    .precaution-list h3 {
+      color: #dc2626;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s ease;
+    }
+    
+    .precaution-list ul {
+      color: var(--text-light);
+      line-height: 1.7;
+      padding-left: 1.5rem;
+      transition: color 0.3s ease;
+    }
+    
+    .precaution-list li {
+      margin-bottom: 0.75rem;
+    }
+    
+    .success-box {
+      text-align: center;
+      background: #f0fdf4;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      border: 2px solid #bbf7d0;
+      animation: fadeInUp 0.6s ease-out 0.2s forwards;
+      opacity: 0;
+    }
+
+    [data-theme="dark"] .success-box {
+      background: #1a2c1e;
+      border-color: #2d5c3d;
+    }
+    
+    .success-icon {
+      font-size: 3rem;
+      color: #16a34a;
+      margin-bottom: 1rem;
+      transition: color 0.3s ease;
+    }
+    
+    .patient-info-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--primary-pink);
+      margin: 1.5rem 0;
+      animation: fadeInUp 0.6s ease-out 0.2s forwards;
+      opacity: 0;
+    }
+    
+    .patient-info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .patient-info-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--primary-pink);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s ease;
+    }
+    
+    .patient-info-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      padding: 0.25rem 0;
+      font-size: 0.875rem;
+      color: var(--text-light);
+      transition: color 0.3s ease;
+    }
+    
+    .patient-info-label {
+      font-weight: 500;
+    }
+    
+    .patient-info-value {
+      font-weight: 600;
+    }
+    
+    .visualization-card img {
+      transition: transform 0.3s ease;
+    }
+
+    .visualization-card:hover img {
+      transform: scale(1.02);
+    }
+    
+    /* NEW: Social Media Colors - Fixed to match common page */
+    .social-x { color: #000000 !important; }
+    .social-facebook { color: #1877F2 !important; }
+    .social-whatsapp { color: #25D366 !important; }
+    .social-instagram { color: #E4405F !important; }
+    .social-linkedin { color: #0A66C2 !important; }
+    .social-youtube { color: #FF0000 !important; }
+
+    [data-theme="dark"] .social-x { color: #ffffff !important; }
+    [data-theme="dark"] .social-facebook { color: #1877F2 !important; }
+    [data-theme="dark"] .social-whatsapp { color: #25D366 !important; }
+    [data-theme="dark"] .social-instagram { color: #E4405F !important; }
+    [data-theme="dark"] .social-linkedin { color: #0A66C2 !important; }
+    [data-theme="dark"] .social-youtube { color: #FF0000 !important; }
+
+    /* New styles for interactive visualizations */
+    .risk-gauge {
+      width: 100%;
+      height: 120px;
+      position: relative;
+      margin: 1rem 0;
+    }
+    
+    .gauge-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-pink);
+    }
+    
+    .collapsible {
+      cursor: pointer;
+      padding: 1rem;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    [data-theme="dark"] .collapsible {
+      background: rgba(55, 65, 81, 0.5);
+    }
+    
+    .collapsible:hover {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    [data-theme="dark"] .collapsible:hover {
+      background: rgba(55, 65, 81, 0.8);
+    }
+    
+    .collapsible-content {
+      padding: 0 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, padding 0.3s ease;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 0 0 8px 8px;
+    }
+
+    [data-theme="dark"] .collapsible-content {
+      background: rgba(55, 65, 81, 0.3);
+    }
+    
+    .collapsible.active + .collapsible-content {
+      max-height: 500px;
+      padding: 1rem;
+    }
+    
+    .feature-comparison-bar {
+      height: 8px;
+      border-radius: 4px;
+      margin: 0.5rem 0;
+      background: #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    [data-theme="dark"] .feature-comparison-bar {
+      background: #475569;
+    }
+    
+    .feature-comparison-fill {
+      height: 100%;
+      border-radius: 4px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    
+    .feature-comparison-patient {
+      background: var(--primary-pink);
+      z-index: 2;
+    }
+    
+    .feature-comparison-benign {
+      background: #10b981;
+      opacity: 0.7;
+      z-index: 1;
+    }
+    
+    .feature-comparison-malignant {
+      background: #ef4444;
+      opacity: 0.7;
+      z-index: 1;
+    }
+    
+    .feature-comparison-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 0.25rem;
+    }
+
+    [data-theme="dark"] .feature-comparison-labels {
+      color: #94a3b8;
+    }
+    
+    .recommendation-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      border-left: 4px solid #3b82f6;
+      transition: all 0.3s ease;
+    }
+    
+    .recommendation-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .recommendation-card h4 {
+      color: #3b82f6;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      border-bottom: 1px dotted #64748b;
+      cursor: help;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #1f2937;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 0.5rem;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.875rem;
+      font-weight: normal;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    @media (max-width: 768px) {
+      .results-grid, .visualization-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn-primary, .btn-secondary {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .nav-container {
+        padding: 0 1rem;
+      }
+      
+      .nav-center {
+        display: none;
+      }
+      
+      .mobile-menu-button {
+        display: block;
+      }
+      
+      .chart-container {
+        height: 250px;
+      }
+    }
+
+    /* Scroll Buttons */
+    .scroll-btn {
+      position: fixed;
+      width: 40px;
+      height: 40px;
+      background: var(--primary-pink);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      animation: pulse 2s infinite;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .scroll-btn.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .scroll-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(233, 30, 99, 0.3);
+    }
+
+    #backToTop {
+      right: 2rem;
+      bottom: 2rem;
+    }
+
+    #backToDown {
+      right: 2rem;
+      bottom: 5rem;
+    }
+
+    /* PDF Generation Progress Modal - Unique Animation */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .pdf-progress {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    /* Circular Progress Bar */
+    .circular-progress {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 2rem;
+    }
+
+    .circular-progress-bg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    [data-theme="dark"] .circular-progress-bg {
+      background: #475569;
+    }
+
+    .circular-progress-fill {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(var(--primary-pink) 0%, var(--secondary-pink) 100%);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      transform: rotate(-90deg);
+      transition: transform 1s ease;
+    }
+
+    .circular-progress-inner {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-pink);
+    }
+
+    /* Document Assembly Animation */
+    .document-assembly {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+
+    .document-part {
+      position: absolute;
+      background: var(--primary-pink);
+      border-radius: 4px;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.5s ease;
+    }
+
+    .document-part-1 {
+      width: 80px;
+      height: 100px;
+      top: 10px;
+      left: 20px;
+      z-index: 1;
+    }
+
+    .document-part-2 {
+      width: 70px;
+      height: 90px;
+      top: 15px;
+      left: 25px;
+      background: var(--accent-pink);
+      z-index: 2;
+    }
+
+    .document-part-3 {
+      width: 60px;
+      height: 80px;
+      top: 20px;
+      left: 30px;
+      background: var(--secondary-pink);
+      z-index: 3;
+    }
+
+    /* Enhanced document animation styles */
+    @keyframes documentSlideEnhanced {
+      0% {
+        transform: translateY(-30px) scale(0.8) rotate(-5deg);
+        opacity: 0;
+        box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+      }
+      30% {
+        transform: translateY(10px) scale(1.05) rotate(2deg);
+        opacity: 0.8;
+        box-shadow: 0 15px 25px rgba(233, 30, 99, 0.4);
+      }
+      70% {
+        transform: translateY(-5px) scale(0.98) rotate(-1deg);
+        opacity: 1;
+        box-shadow: 0 10px 20px rgba(233, 30, 99, 0.35);
+      }
+      100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 1;
+        box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+      }
+    }
+
+    .document-part.active {
+      animation: documentSlideEnhanced 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* Confetti animation */
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(500px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Document Icon Animation */
+    .document-icon-final {
+      font-size: 4rem;
+      color: var(--primary-pink);
+      margin: 0 auto 2rem;
+      animation: documentPulse 2s infinite;
+    }
+
+    @keyframes documentPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    /* Spinner */
+    .spinner {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary-pink);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    [data-theme="dark"] .spinner {
+      border-top-color: var(--accent-pink);
+      border-color: #374151;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Floating Dots Background */
+    .floating-dots {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+   
+    .dot {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(233, 30, 99, 0.15);
+      animation: float 8s infinite ease-in-out;
+    }
+   
+    [data-theme="dark"] .dot {
+      background: rgba(244, 143, 177, 0.15);
+    }
+   
+    @keyframes float {
+      0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.5;
+      }
+      25% {
+        transform: translate(15px, 20px) rotate(5deg);
+        opacity: 0.8;
+      }
+      50% {
+        transform: translate(10px, 35px) rotate(0deg);
+        opacity: 1;
+      }
+      75% {
+        transform: translate(20px, 15px) rotate(-5deg);
+        opacity: 0.8;
+      }
+    }
+
+    /* Visual Elements */
+    .visual-element {
+      position: absolute;
+      z-index: 1;
+      opacity: 0.7;
+    }
+
+    .circle-1 {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(233, 30, 99, 0.1);
+      top: 10%;
+      left: 10%;
+      animation: pulse 4s infinite ease-in-out;
+    }
+
+    .circle-2 {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: rgba(142, 36, 170, 0.1);
+      bottom: 10%;
+      right: 10%;
+      animation: pulse 5s infinite ease-in-out;
+    }
+
+    .square-1 {
+      width: 80px;
+      height: 80px;
+      background: rgba(236, 64, 122, 0.1);
+      top: 20%;
+      right: 15%;
+      transform: rotate(45deg);
+      animation: rotate 10s infinite linear;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="globalProgressBar" style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1001; display: none;">
+    <div class="progress-fill" id="globalProgressFill"></div>
+  </div>
+
+  <!-- Floating Dots Background -->
+  <div class="floating-dots" id="floatingDots"></div>
+  
+  <!-- Visual Elements -->
+  <div class="visual-element circle-1"></div>
+  <div class="visual-element circle-2"></div>
+<div class="visual-element square-1"></div>
+
+  <!-- Navigation - FIXED: Matching Common Page Layout -->
+  <nav class="glass sticky top-0 z-50 py-4 bg-white/80 backdrop-blur-md">
+    <div class="nav-container">
+      <!-- Left: Logo and Title -->
+      <div class="nav-left">
+        <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-xl flex items-center justify-center shadow-lg">
+          <i class="fas fa-ribbon text-white"></i>
+        </div>
+        <span class="text-xl font-bold" style="color: var(--text-color, #1f2937);">
+          BreastCare<span style="color: #ec4899;">AI</span>
+        </span>
+      </div>
+     
+      <!-- Center: Navigation Links -->
+      <div class="nav-center hidden md:flex">
+      
+        <a href="#model-predictions" class="nav-link font-medium">Model Predictions</a>
+        <a href="#model-comparison" class="nav-link font-medium">Model Comparison</a>
+        <a href="#risk-factor" class="nav-link font-medium">Risk Factors</a>
+        <a href="#feature-comparison" class="nav-link font-medium" title="Features">Feature Comparison</a>
+      </div>
+     
+      <!-- Right: Theme Toggle -->
+      <div class="nav-right">
+        <button id="navThemeToggle" class="theme-toggle">
+          <i class="fas fa-moon" id="navThemeIcon"></i>
+        </button>
+        
+        <!-- Mobile menu button -->
+        <button class="mobile-menu-button md:hidden">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="result-card">
+      <h1 class="title">Prediction Summary</h1>
+      <p class="subtitle">Analysis completed using trained machine learning models. {{ payload.model_selection_text }}</p>
+
+      {% if payload.results %}
+        <!-- Patient Information -->
+        <h2 class="section-title">Patient Information</h2>
+        <div class="patient-info-card" role="region" aria-labelledby="patient-info">
+          <h3 id="patient-info"><i class="fas fa-user"></i> Submitted Details</h3>
+          <div class="patient-info-item">
+            <span class="patient-info-label">Name:</span>
+            <span class="patient-info-value">{{ patient_info.patient_name | default('Not Provided') }}</span>
+          </div>
+          <div class="patient-info-item">
+            <span class="patient-info-label">Age:</span>
+            <span class="patient-info-value">{{ patient_info.age | default('Not Provided') }}</span>
+          </div>
+          <div class="patient-info-item">
+            <span class="patient-info-label">Gender:</span>
+            <span class="patient-info-value">{{ patient_info.gender | default('Not Provided') | capitalize }}</span>
+          </div>
+          <div class="patient-info-item">
+            <span class="patient-info-label">Medical History:</span>
+            <span class="patient-info-value">{{ patient_info.medical_history | default('None') }}</span>
+          </div>
+        </div>
+
+        <!-- Cancer Detection Summary -->
+        <div class="success-box" id="prediction-summary">
+          <div class="success-icon">
+            {% if is_malignant %}
+              <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+            {% else %}
+              <i class="fas fa-check-circle" aria-hidden="true"></i>
+            {% endif %}
+          </div>
+
+          {% if is_malignant %}
+            <h3 style="color: #dc2626; margin-bottom: 0.5rem;">Breast Cancer Detected</h3>
+            <p style="color: #475569;">
+              The analysis indicates a high likelihood of malignancy with an average confidence of 
+              {{ (overall_confidence.malignant * 100) | round(2) }}%.
+              Please consult a healthcare professional immediately.
+            </p>
+          {% else %}
+            <h3 style="color: #16a34a; margin-bottom: 0.5rem;">No Cancer Detected</h3>
+            <p style="color: #475569;">
+              The analysis suggests benign characteristics with an average confidence of 
+              {{ (overall_confidence.benign * 100) | round(2) }}%.
+              Continue with regular check-ups as recommended.
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- Risk Level Indicator -->
+        <h2 class="section-title">Risk Level Assessment</h2>
+        <div class="visualization-card">
+          <h4><i class="fas fa-exclamation-circle"></i> Overall Risk Level</h4>
+          <div class="risk-gauge" id="riskGaugeContainer">
+            <canvas id="riskGauge"></canvas>
+            <div class="gauge-value" id="gaugeValue">0%</div>
+          </div>
+          <div id="riskLabel" class="text-center font-semibold text-lg mt-2">Calculating risk level...</div>
+        </div>
+
+        <!-- Prediction Confidence -->
+        <h2 class="section-title">Prediction Confidence</h2>
+        <div class="visualization-card">
+          <h4><i class="fas fa-chart-pie"></i> Overall Prediction Confidence</h4>
+          <div class="chart-container">
+            <canvas id="confidenceChart" aria-label="Prediction confidence chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Model Predictions -->
+        <section id="model-predictions" class="section">
+        <h2 class="section-title">Model Predictions</h2>
+        <div class="results-grid">
+          {% for key, item in payload.results.items() %}
+            <div class="model-card" role="region" aria-labelledby="model-{{ key }}">
+              <h4 id="model-{{ key }}">
+                <i class="fas fa-brain"></i> {{ item.display }}
+              </h4>
+              <div class="model-metrics">
+                <div class="metric-item">
+                  <span class="metric-label">Prediction:</span>
+                  <span class="metric-value">
+                    {% if item.predicted_label == 'Malignant' %}
+                      <span class="prediction-badge prediction-malignant">
+                        <i class="fas fa-exclamation-triangle"></i> Malignant
+                      </span>
+                    {% else %}
+                      <span class="prediction-badge prediction-benign">
+                        <i class="fas fa-check-circle"></i> Benign
+                      </span>
+                    {% endif %}
+                  </span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Confidence:</span>
+                  <span class="metric-value">
+                    {{ (item.confidence * 100) | round(2) }}%
+                    {% if item.confidence > 0.8 %}
+                      <span class="confidence-badge confidence-high">High</span>
+                    {% elif item.confidence > 0.6 %}
+                      <span class="confidence-badge confidence-medium">Medium</span>
+                    {% else %}
+                      <span class="confidence-badge confidence-low">Low</span>
+                    {% endif %}
+                  </span>
+                </div>
+                {% if item.accuracy is not none %}
+                <div class="metric-item">
+                  <span class="metric-label">Model Accuracy:</span>
+                  <span class="metric-value">{{ (item.accuracy * 100) | round(2) }}%</span>
+                </div>
+                {% endif %}
+                <div class="metric-item">
+                  <span class="metric-label">Probabilities:</span>
+                  <span class="metric-value">
+                    Benign: {{ (item.proba.benign * 100) | round(2) }}%<br>
+                    Malignant: {{ (item.proba.malignant * 100) | round(2) }}%
+                  </span>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="pie_{{ key }}" aria-label="Probability chart for {{ item.display }}"></canvas>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        </section>
+
+        <!-- Model Comparison -->
+        <section id="model-comparison" class="section">
+        <h2 class="section-title">Model Comparison</h2>
+        <div class="visualization-card">
+          <h4><i class="fas fa-chart-column"></i> Model Confidence Comparison</h4>
+          <div class="chart-container" style="height: 300px;">
+            <canvas id="modelComparisonChart" aria-label="Model comparison chart"></canvas>
+          </div>
+        </div>
+        </section>
+
+        <!-- Risk Factors Analysis -->
+        <section id="risk-factor" class="section">
+        <h2 class="section-title">Risk Factors Analysis</h2>
+        <div class="visualization-card">
+          <h4><i class="fas fa-exclamation-triangle"></i> Key Risk Factors</h4>
+          <p class="mb-4">The following features most significantly contributed to the prediction:</p>
+          <div class="chart-container" style="height: 350px;">
+            <canvas id="riskFactorsChart" aria-label="Risk factors chart"></canvas>
+          </div>
+        </div>
+        </section>
+
+        <!-- Feature Comparison - Radar Chart -->
+        <section id="feature-comparison" class="section">
+        <h2 class="section-title">Feature Comparison</h2>
+        <div class="visualization-card">
+          <h4><i class="fas fa-chart-radar"></i> Patient Values Compared to Typical Cases</h4>
+          <div class="chart-container" style="height: 400px;">
+            <canvas id="radarChart" aria-label="Radar chart comparison"></canvas>
+          </div>
+        </div>
+        </section>
+
+        <!-- Recommendations -->
+        <h2 class="section-title">Recommendations</h2>
+        <div class="recommendation-card">
+          <h4><i class="fas fa-heart"></i> Next Steps</h4>
+          <div id="recommendationsList">
+            {% if recommendations %}
+              {% for recommendation in recommendations %}
+              <div class="flex items-start mb-3">
+                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>{{ recommendation }}</span>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="flex items-start mb-3">
+                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>Continue with regular breast self-exams monthly.</span>
+              </div>
+              <div class="flex items-start mb-3">
+                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>Schedule routine mammograms as recommended for your age group.</span>
+              </div>
+              <div class="flex items-start mb-3">
+                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>Maintain a healthy lifestyle with regular exercise and a balanced diet.</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Precautions -->
+        {% if precautions %}
+        <h2 class="section-title">Important Precautions</h2>
+        <div class="precaution-list">
+          <h3><i class="fas fa-exclamation-triangle"></i> Immediate Actions Recommended</h3>
+          <ul>
+            {% for precaution in precautions %}
+            <li>{{ precaution }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <!-- Model Explanation -->
+<h2 class="section-title">Understanding Your Results</h2>
+
+<button type="button" class="collapsible">
+  <span>
+    <i class="fas fa-question-circle mr-2"></i>
+    How was this analysis performed?
+  </span>
+  <i class="fas fa-chevron-down"></i>
+</button>
+
+<div class="collapsible-content">
+
+  <p class="mt-4">
+    The system analyzed the provided numerical feature values using trained
+    machine learning models. These models learn statistical patterns from
+    labeled dataset samples and apply them to new inputs.
+  </p>
+
+  <p class="mt-2">
+    The analysis focuses on the following dataset-derived features:
+  </p>
+
+  <ul class="list-disc pl-5 mt-2">
+    <li><strong>Radius (Mean):</strong> Average distance from the center to boundary points</li>
+    <li><strong>Texture (Mean):</strong> Variation in gray-scale intensity values</li>
+    <li><strong>Perimeter (Mean):</strong> Average length of the cell boundary</li>
+    <li><strong>Area (Mean):</strong> Average size of the cell region</li>
+    <li><strong>Smoothness (Mean):</strong> Local variation in boundary smoothness</li>
+    <li><strong>Compactness (Mean):</strong> Perimeter² divided by area (normalized)</li>
+    <li><strong>Concavity (Mean):</strong> Degree of inward curvature in the boundary</li>
+    <li><strong>Concave Points (Mean):</strong> Number of concave boundary points</li>
+  </ul>
+
+  <p class="mt-3">
+    The selected machine learning model outputs a probability score indicating
+    how closely the input data matches learned patterns. This score represents
+    model confidence and is not a medical diagnosis.
+  </p>
+
+</div>
+
+
+        <!-- Button Group - Updated with Dashboard button -->
+        <div class="btn-group">
+          <a href="{{ url_for('data_prediction') }}" class="btn-secondary" aria-label="Back to Data Prediction page">
+            <i class="fas fa-chart-line mr-2"></i> Start New Data Analysis
+          </a>
+          <a href="{{ url_for('common_page') }}" class="btn-secondary" aria-label="Back to Dashboard page">
+            <i class="fas fa-tachometer-alt mr-2"></i> Back to Dashboard
+          </a>
+          <button type="button" id="downloadReportBtn" class="btn-primary flex items-center" aria-label="Download PDF report">
+            <span class="spinner" id="download-spinner"></span>
+            <i class="fas fa-file-pdf mr-2"></i>  Download Analysis Report (PDF)
+          </button>
+        </div>
+      {% else %}
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>No results to display. Please try running the prediction again.</span>
+        </div>
+        <div class="btn-group">
+          <a href="{{ url_for('data_prediction') }}" class="btn-primary" aria-label="Back to Data Prediction page">
+            <i class="fas fa-home mr-2"></i> Back to Data Analysis
+          </a>
+          <a href="{{ url_for('common_page') }}" class="btn-secondary" aria-label="Back to Dashboard page">
+            <i class="fas fa-tachometer-alt mr-2"></i> Back to Dashboard
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Footer -->
+<footer class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white pt-16 pb-8 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+
+            <!-- Brand -->
+            <div>
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-ribbon text-white"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-gray-900 dark:text-white">BreastCareAI</span>
+                        <div class="text-xs text-gray-700 dark:text-gray-400 -mt-1">
+                            AI-Based Educational Risk Analysis Platform
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    BreastCareAI is an academic project demonstrating how machine learning
+                    and deep learning techniques can be applied to breast cancer-related
+                    data for educational and research purposes.
+                </p>
+
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-x-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">Quick Links</h3>
+                <ul class="space-y-3">
+                    <li><a href="/" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Home</a></li>
+                    <li><a href="#features" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Features</a></li>
+                    <li><a href="#how-it-works" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">How It Works</a></li>
+                    <li><a href="#symptoms" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Symptoms</a></li>
+                    <li><a href="#prevention" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Awareness</a></li>
+                    <li><a href="#about" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">About</a></li>
+                    <li><a href="#faq" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">FAQ</a></li>
+                </ul>
+            </div>
+
+            <!-- Services -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">System Modules</h3>
+                <ul class="space-y-3">
+                    <li class="text-gray-700 dark:text-gray-400">Data-Based Prediction</li>
+                    <li class="text-gray-700 dark:text-gray-400">Image-Based Analysis</li>
+                    <li class="text-gray-700 dark:text-gray-400">Symptoms Assessment</li>
+                    <li class="text-gray-700 dark:text-gray-400">Risk Visualization</li>
+                    <li class="text-gray-700 dark:text-gray-400">Report Generation</li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">Contact</h3>
+                <div class="space-y-3 text-gray-700 dark:text-gray-400">
+                    <p class="flex items-center">
+                        <i class="fas fa-envelope mr-3 text-pink-500"></i>
+                        breastcareai@gmail.com
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-3 text-pink-500"></i>
+                        Mumbai, India
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="border-t border-gray-300 dark:border-gray-800 pt-8 text-center">
+            <p class="text-gray-700 dark:text-gray-400 text-sm mb-2">
+                © 2025 BreastCareAI • Academic Project
+            </p>
+            <p class="text-gray-600 dark:text-gray-500 text-xs max-w-4xl mx-auto">
+                Disclaimer: BreastCareAI is an educational and research-based system.
+                It does not provide medical diagnosis, treatment, or professional healthcare advice.
+            </p>
+        </div>
+
+    </div>
+</footer>
+
+  <!-- Scroll Buttons -->
+  <button id="backToTop" class="scroll-btn" aria-label="Back to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+  <button id="backToDown" class="scroll-btn" aria-label="Back to bottom">
+    <i class="fas fa-arrow-down"></i>
+  </button>
+
+  <!-- PDF Generation Progress Modal - Unique Animation -->
+  <div id="pdfProgressModal" class="modal">
+    <div class="modal-content pdf-progress">
+      <div class="circular-progress">
+        <div class="circular-progress-bg">
+          <div class="circular-progress-fill" id="circularProgressFill"></div>
+        </div>
+        <div class="circular-progress-inner" id="circularProgressText">0%</div>
+      </div>
+      
+      <div class="document-assembly">
+        <div class="document-part document-part-1"></div>
+        <div class="document-part document-part-2"></div>
+        <div class="document-part document-part-3"></div>
+      </div>
+      
+      <i class="fas fa-file-pdf document-icon-final" id="documentIconFinal" style="display: none;"></i>
+      
+      <h2 class="text-2xl font-bold mb-4" id="pdfProgressTitle"> Preparing Your  Analysis Report</h2>
+      <p class="mb-6" id="pdfProgressMessage">Compiling results, confidence scores, and summary insights. Please wait…</p>
+      
+      <div class="progress-bar">
+        <div class="progress-fill" id="pdfProgressFill"></div>
+      </div>
+      <p class="mt-2 text-sm" id="pdfProgressPercentage">0% Complete</p>
+    </div>
+  </div>
+
+  <script>
+    // Create floating dots
+    function createFloatingDots() {
+      const container = document.getElementById('floatingDots');
+      const dotCount = 15;
+     
+      for (let i = 0; i < dotCount; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+       
+        // Random size between 5px and 25px
+        const size = Math.random() * 20 + 5;
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+       
+        // Random position
+        dot.style.left = `${Math.random() * 100}%`;
+        dot.style.top = `${Math.random() * 100}%`;
+       
+        // Random animation delay
+        dot.style.animationDelay = `${Math.random() * 8}s`;
+       
+        // Random opacity
+        dot.style.opacity = Math.random() * 0.5 + 0.2;
+       
+        container.appendChild(dot);
+      }
+    }
+
+    // Theme toggle functionality - UPDATED to match common page
+    function initThemeToggle() {
+      const themeToggle = document.getElementById('navThemeToggle');
+      const themeIcon = document.getElementById('navThemeIcon');
+     
+      // Check for saved theme preference or use preferred color scheme
+      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+      const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme.matches ? 'dark' : 'light');
+     
+      // Set the theme
+      if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.className = 'fas fa-sun';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeIcon.className = 'fas fa-moon';
+      }
+     
+      // Toggle theme function
+      function toggleTheme() {
+        if (document.documentElement.getAttribute('data-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'light');
+          localStorage.setItem('theme', 'light');
+          themeIcon.className = 'fas fa-moon';
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+          themeIcon.className = 'fas fa-sun';
+        }
+        // Update charts when theme changes
+        setTimeout(initializeCharts, 100);
+      }
+     
+      // Add event listener
+      themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // Collapsible functionality
+    document.querySelectorAll('.collapsible').forEach(button => {
+      button.addEventListener('click', function() {
+        this.classList.toggle('active');
+        const icon = this.querySelector('.fa-chevron-down');
+        if (icon) {
+          icon.classList.toggle('fa-rotate-180');
+        }
+      });
+    });
+    
+    // Data from Flask backend
+    const flaskData = {
+      patientFeatures: {{ patient_features | tojson }},
+      benignAverages: {{ benign_averages | tojson }},
+      malignantAverages: {{ malignant_averages | tojson }},
+      featureImportance: {{ feature_importance | tojson }},
+      overallConfidence: {{ overall_confidence | tojson }},
+      riskLevel: {{ risk_level | tojson }},
+      isMalignant: {{ is_malignant | tojson }},
+      featureNames: {{ feature_names | tojson }},
+      featureValues: {{ feature_values | tojson }},
+      modelResults: {{ payload.results | tojson }}
+    };
+    
+    // Initialize all charts and visualizations
+    function initializeCharts() {
+      try {
+        const results = flaskData.modelResults;
+        if (!results || typeof results !== 'object' || Object.keys(results).length === 0) {
+          console.warn('No valid results data for charts');
+          return;
+        }
+        
+        // Calculate overall prediction confidence
+        const benignConfidence = flaskData.overallConfidence.benign || 0;
+        const malignantConfidence = flaskData.overallConfidence.malignant || 0;
+        const riskLevel = flaskData.riskLevel || 0;
+        const isMalignant = flaskData.isMalignant || false;
+        
+        // Update risk gauge
+        createRiskGauge(riskLevel);
+        
+        // Create confidence chart
+        createConfidenceChart(benignConfidence, malignantConfidence);
+        
+        // Create model comparison chart
+        createModelComparisonChart(results);
+        
+        // Create risk factors chart
+        createRiskFactorsChart(flaskData.featureImportance);
+        
+        // Create radar chart
+        createRadarChart();
+        
+        // Individual model charts
+        Object.keys(results).forEach((key) => {
+          const el = document.getElementById('pie_' + key);
+          if (!el) return;
+          
+          const ctx = el.getContext('2d');
+          const data = results[key];
+          
+          new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: ['Benign', 'Malignant'],
+              datasets: [{
+                data: [data.proba.benign || 0, data.proba.malignant || 0],
+                backgroundColor: ['#10b981', '#ef4444'],
+                borderWidth: 0,
+                hoverOffset: 8
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { 
+                  position: 'bottom',
+                  labels: {
+                    font: { family: "'Open Sans', sans-serif" },
+                    padding: 15,
+                    color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f3f4f6' : '#1f2937'
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (context) => {
+                      const label = context.label || '';
+                      const value = context.raw || 0;
+                      return `${label}: ${(value * 100).toFixed(2)}%`;
+                    }
+                  }
+                }
+              },
+              cutout: '60%'
+            }
+          });
+        });
+        
+      } catch (error) {
+        console.error('Error initializing charts:', error);
+      }
+    }
+    
+    // Create risk gauge chart
+    function createRiskGauge(riskLevel) {
+      const ctx = document.getElementById('riskGauge').getContext('2d');
+      const gaugeValue = document.getElementById('gaugeValue');
+      const riskLabel = document.getElementById('riskLabel');
+      
+      const riskPercent = Math.round(riskLevel * 100);
+      gaugeValue.textContent = `${riskPercent}%`;
+      
+      // Set risk label and color
+      let riskText, riskColor;
+      if (riskPercent < 20) {
+        riskText = 'Low Risk';
+        riskColor = '#16a34a'; // Green
+      } else if (riskPercent < 60) {
+        riskText = 'Moderate Risk';
+        riskColor = '#d97706'; // Amber
+      } else {
+        riskText = 'High Risk';
+        riskColor = '#dc2626'; // Red
+      }
+      
+      riskLabel.textContent = riskText;
+      riskLabel.style.color = riskColor;
+      
+      // Create gauge chart
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [riskLevel, 1 - riskLevel],
+            backgroundColor: [riskColor, '#e5e7eb'],
+            borderWidth: 0,
+            circumference: 180,
+            rotation: 270
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              enabled: false
+            }
+          }
+        }
+      });
+    }
+    
+    // Create confidence chart
+    function createConfidenceChart(benignConfidence, malignantConfidence) {
+      const ctx = document.getElementById('confidenceChart').getContext('2d');
+      
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Benign', 'Malignant'],
+          datasets: [{
+            data: [benignConfidence, malignantConfidence],
+            backgroundColor: ['#10b981', '#ef4444'],
+            borderWidth: 0,
+            hoverOffset: 12
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { 
+              position: 'bottom',
+              labels: {
+                font: { family: "'Open Sans', sans-serif" },
+                padding: 15,
+                color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f3f4f6' : '#1f2937'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  return `${label}: ${(value * 100).toFixed(2)}%`;
+                }
+              }
+            }
+          },
+          cutout: '60%'
+        }
+      });
+    }
+    
+    // Create model comparison chart
+    function createModelComparisonChart(results) {
+      const ctx = document.getElementById('modelComparisonChart').getContext('2d');
+      
+      const models = Object.keys(results).map(k => results[k].display);
+      const benignProbs = Object.keys(results).map(k => results[k].proba.benign || 0);
+      const malignantProbs = Object.keys(results).map(k => results[k].proba.malignant || 0);
+      
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#f3f4f6' : '#1f2937';
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: models,
+          datasets: [
+            {
+              label: 'Benign Confidence',
+              data: benignProbs,
+              backgroundColor: '#10b981',
+              borderRadius: 6,
+              borderWidth: 0
+            },
+            {
+              label: 'Malignant Confidence',
+              data: malignantProbs,
+              backgroundColor: '#ef4444',
+              borderRadius: 6,
+              borderWidth: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 1,
+              ticks: { 
+                callback: (value) => (value * 100).toFixed(0) + '%',
+                font: { family: "'Open Sans', sans-serif" },
+                color: textColor
+              },
+              title: {
+                display: true,
+                text: 'Confidence Level',
+                font: { family: "'Poppins', sans-serif", weight: '500' },
+                color: textColor
+              },
+              grid: { 
+                color: gridColor
+              }
+            },
+            x: {
+              ticks: { 
+                font: { family: "'Open Sans', sans-serif" },
+                color: textColor
+              },
+              grid: { display: false }
+            }
+          },
+          plugins: {
+            legend: { 
+              position: 'top',
+              labels: {
+                font: { family: "'Open Sans', sans-serif" },
+                color: textColor
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  return `${context.dataset.label}: ${(context.raw * 100).toFixed(2)}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Create risk factors chart
+    function createRiskFactorsChart(featureImportance) {
+      const ctx = document.getElementById('riskFactorsChart').getContext('2d');
+      
+      // Sort features by importance
+      const sortedFeatures = Object.entries(featureImportance)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8); // Top 8 features
+      
+      const featureNames = sortedFeatures.map(([key]) => 
+        key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      );
+      
+      const importanceValues = sortedFeatures.map(([, value]) => value);
+      
+      // Different colors for each feature
+      const colors = ['#ef4444', '#f59e0b', '#eab308', '#84cc16', '#22c55e', '#16a34a', '#15803d', '#166534'];
+      
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#f3f4f6' : '#1f2937';
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: featureNames,
+          datasets: [{
+            label: 'Importance',
+            data: importanceValues,
+            backgroundColor: colors.slice(0, sortedFeatures.length),
+            borderRadius: 6,
+            borderWidth: 0
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 0.3,
+              ticks: { 
+                font: { family: "'Open Sans', sans-serif" },
+                color: textColor
+              },
+              title: {
+                display: true,
+                text: 'Importance Score',
+                font: { family: "'Poppins', sans-serif", weight: '500' },
+                color: textColor
+              },
+              grid: { 
+                color: gridColor
+              }
+            },
+            y: {
+              ticks: { 
+                font: { family: "'Open Sans', sans-serif" },
+                color: textColor
+              },
+              grid: { display: false }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (context) => {
+                  return context[0].label;
+                },
+                label: (context) => {
+                  return `Importance: ${(context.raw * 100).toFixed(2)}%`;
+                },
+                afterLabel: (context) => {
+                  const feature = sortedFeatures[context.dataIndex][0];
+                  return getFeatureExplanation(feature);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Create radar chart
+    function createRadarChart() {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      
+      const features = flaskData.featureNames || ['radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean', 'compactness_mean', 'concavity_mean', 'concave points_mean'];
+      
+      const patientData = [];
+      const benignData = [];
+      const malignantData = [];
+      
+      features.forEach(f => {
+        const p = flaskData.patientFeatures[f] || 0;
+        const b = flaskData.benignAverages[f] || 0;
+        const m = flaskData.malignantAverages[f] || 0;
+        const maxVal = Math.max(p, b, m, 1); // Avoid division by zero
+        patientData.push((p / maxVal) * 100);
+        benignData.push((b / maxVal) * 100);
+        malignantData.push((m / maxVal) * 100);
+      });
+      
+      const labels = features.map(f => f.replace('_mean', ' Mean').replace(/_/g, ' '));
+      
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+      const textColor = isDark ? '#f3f4f6' : '#1f2937';
+      
+      new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Patient Values',
+            data: patientData,
+            borderColor: 'rgb(168, 85, 247)',
+            backgroundColor: 'rgba(168, 85, 247, 0.2)',
+            pointBackgroundColor: 'rgb(168, 85, 247)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(168, 85, 247)'
+          }, {
+            label: 'Typical Benign Cases',
+            data: benignData,
+            borderColor: 'rgb(34, 197, 94)',
+            backgroundColor: 'rgba(34, 197, 94, 0.2)',
+            pointBackgroundColor: 'rgb(34, 197, 94)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(34, 197, 94)'
+          }, {
+            label: 'Typical Malignant Cases',
+            data: malignantData,
+            borderColor: 'rgb(239, 68, 68)',
+            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+            pointBackgroundColor: 'rgb(239, 68, 68)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(239, 68, 68)'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              beginAtZero: true,
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 20,
+                callback: function(value) {
+                  return value + '%';
+                },
+                backdropColor: 'transparent',
+                color: textColor
+              },
+              pointLabels: {
+                font: {
+                  size: 12,
+                  family: "'Open Sans', sans-serif"
+                },
+                color: textColor
+              },
+              angleLines: {
+                color: gridColor
+              },
+              grid: {
+                color: gridColor
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  family: "'Open Sans', sans-serif"
+                },
+                color: textColor
+              }
+            },
+            title: {
+              display: true,
+              text: 'Patient Values Compared to Typical Benign and Malignant Cases',
+              font: {
+                family: "'Poppins', sans-serif",
+                size: 16,
+                weight: 'bold'
+              },
+              color: textColor
+            }
+          },
+          elements: {
+            line: {
+              borderWidth: 3
+            }
+          }
+        }
+      });
+    }
+    
+    // Get explanation for a feature
+    function getFeatureExplanation(feature) {
+      const explanations = {
+        radius_mean: "Mean distance from center to points on the perimeter. Larger values may indicate abnormal cell growth.",
+        texture_mean: "Standard deviation of gray-scale values. Higher values suggest more variation in cell texture.",
+        perimeter_mean: "Total length of the cell boundary. Increased perimeter often correlates with malignancy.",
+        area_mean: "Total size of the cell. Larger area can be associated with cancerous cells.",
+        smoothness_mean: "Local variation in radius lengths. Lower values indicate smoother contours.",
+        compactness_mean: "Perimeter² / area - 1.0. Higher values indicate more compact (possibly irregular) shapes.",
+        concavity_mean: "Severity of concave portions of the contour. Higher values indicate more concavity.",
+        concave_points_mean: "Number of concave portions of the contour. More concave points may suggest malignancy."
+      };
+      
+      return explanations[feature] || "This feature contributes to the prediction model.";
+    }
+
+    // FIXED: Enhanced PDF Download Function with Direct Download
+    function triggerPDFDownload() {
+      // Create a hidden iframe for download
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = "{{ url_for('download_report') }}";
+      document.body.appendChild(iframe);
+      
+      // Remove iframe after download attempt
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 10000); // Remove after 10 seconds
+      
+      // Alternative method: Direct window location
+      setTimeout(() => {
+        // Force download by opening in new window
+        const downloadWindow = window.open("{{ url_for('download_report') }}", '_blank');
+        if (!downloadWindow) {
+          // If popup blocked, fallback to direct download
+          window.location.href = "{{ url_for('download_report') }}";
+        }
+      }, 500);
+    }
+
+    // Create confetti effect
+    function createConfetti() {
+      const colors = ['#e91e63', '#ec407a', '#ad1457', '#8e24aa', '#f48fb1'];
+      const confettiContainer = document.createElement('div');
+      confettiContainer.style.position = 'fixed';
+      confettiContainer.style.top = '0';
+      confettiContainer.style.left = '0';
+      confettiContainer.style.width = '100%';
+      confettiContainer.style.height = '100%';
+      confettiContainer.style.pointerEvents = 'none';
+      confettiContainer.style.zIndex = '10000';
+      
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.position = 'absolute';
+        confetti.style.width = '10px';
+        confetti.style.height = '10px';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        confetti.style.top = '-20px';
+        confetti.style.left = `${Math.random() * 100}%`;
+        confetti.style.opacity = '0';
+        
+        const animation = confetti.animate([
+          { transform: `translateY(0px) rotate(0deg)`, opacity: 0 },
+          { transform: `translateY(${window.innerHeight * 0.5}px) rotate(${Math.random() * 360}deg)`, opacity: 1, offset: 0.5 },
+          { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+        ], {
+          duration: 2000 + Math.random() * 1000,
+          easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+        });
+        
+        confettiContainer.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 3000);
+      }
+      
+      document.body.appendChild(confettiContainer);
+      setTimeout(() => confettiContainer.remove(), 3000);
+    }
+
+    // PDF Generation Progress Simulation - ENHANCED VERSION
+    function simulatePDFGenerationProgress() {
+      const circularProgressFill = document.getElementById('circularProgressFill');
+      const circularProgressText = document.getElementById('circularProgressText');
+      const pdfProgressFill = document.getElementById('pdfProgressFill');
+      const pdfProgressPercentage = document.getElementById('pdfProgressPercentage');
+      const pdfProgressTitle = document.getElementById('pdfProgressTitle');
+      const pdfProgressMessage = document.getElementById('pdfProgressMessage');
+      const documentParts = document.querySelectorAll('.document-part');
+      const documentAssembly = document.querySelector('.document-assembly');
+      const documentIconFinal = document.getElementById('documentIconFinal');
+      
+      // Reset all animation elements
+      documentAssembly.style.display = 'block';
+      documentIconFinal.style.display = 'none';
+      documentParts.forEach(part => part.classList.remove('active'));
+      
+      // Initial state
+let progress = 0;
+
+const steps = [
+  {
+    threshold: 10,
+    title: "Initializing Report",
+    message: "Setting up the analysis report structure..."
+  },
+  {
+    threshold: 25,
+    title: "Gathering Data",
+    message: "Collecting model outputs and input summaries..."
+  },
+  {
+    threshold: 40,
+    title: "Processing Visualizations",
+    message: "Generating charts and data visualizations..."
+  },
+  {
+    threshold: 55,
+    title: "Analyzing Results",
+    message: "Compiling classification results and confidence scores..."
+  },
+  {
+    threshold: 70,
+    title: "Formatting Document",
+    message: "Applying a clean and professional report layout..."
+  },
+  {
+    threshold: 85,
+    title: "Adding User Details",
+    message: "Including provided input information and analysis summaries..."
+  },
+  {
+    threshold: 95,
+    title: "Finalizing Report",
+    message: "Performing final checks and preparing the PDF file..."
+  }
+];
+
+      
+      // Start document assembly animation in phases
+      setTimeout(() => documentParts[0].classList.add('active'), 300);
+      setTimeout(() => documentParts[1].classList.add('active'), 800);
+      setTimeout(() => documentParts[2].classList.add('active'), 1300);
+      
+      const interval = setInterval(() => {
+        progress += Math.random() * 8 + 2; // Faster progress
+        
+        // Update circular progress
+        const degrees = (progress / 100) * 360;
+        circularProgressFill.style.transform = `rotate(${degrees - 90}deg)`;
+        circularProgressText.textContent = `${Math.round(progress)}%`;
+        
+        // Update linear progress
+        pdfProgressFill.style.width = `${progress}%`;
+        pdfProgressPercentage.textContent = `${Math.round(progress)}% Complete`;
+        
+        // Update messages based on progress
+        let currentStep = steps[0];
+        for (let i = steps.length - 1; i >= 0; i--) {
+          if (progress >= steps[i].threshold) {
+            currentStep = steps[i];
+            break;
+          }
+        }
+        pdfProgressTitle.textContent = currentStep.title;
+        pdfProgressMessage.textContent = currentStep.message;
+        
+        // Document assembly animation
+        if (progress >= 20 && progress < 40) {
+          documentParts.forEach(part => {
+            part.style.transform = `translateY(${Math.sin(Date.now() / 200) * 3}px)`;
+          });
+        }
+        
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          
+          // Final animations
+          circularProgressFill.style.transform = 'rotate(270deg)';
+          circularProgressText.textContent = '100%';
+          pdfProgressFill.style.width = '100%';
+          pdfProgressPercentage.textContent = '100% Complete';
+          pdfProgressTitle.textContent = 'Report Ready!';
+          pdfProgressMessage.textContent = 'Starting download process...';
+          
+          // Document assembly completion animation
+          documentParts.forEach(part => {
+            part.style.animation = 'none';
+            setTimeout(() => {
+              part.style.transition = 'all 0.5s ease';
+              part.style.opacity = '0';
+              part.style.transform = 'scale(0.8) translateY(20px)';
+            }, 300);
+          });
+          
+          // Show final document icon with animation
+          setTimeout(() => {
+            documentAssembly.style.display = 'none';
+            documentIconFinal.style.display = 'block';
+            documentIconFinal.style.animation = 'documentPulse 1s ease-out 0.2s both';
+            
+            // Success animation
+            documentIconFinal.animate([
+              { transform: 'scale(0.5)', opacity: 0 },
+              { transform: 'scale(1.1)', opacity: 1, offset: 0.6 },
+              { transform: 'scale(1)', opacity: 1 }
+            ], {
+              duration: 800,
+              easing: 'ease-out'
+            });
+          }, 800);
+          
+          // Trigger download after final animation
+          setTimeout(() => {
+            document.getElementById('pdfProgressModal').style.display = 'none';
+            
+            // Reset button state
+            const downloadBtn = document.getElementById('downloadReportBtn');
+            downloadBtn.disabled = false;
+            document.getElementById('download-spinner').style.display = 'none';
+            
+            // Trigger actual download
+            triggerPDFDownload();
+            
+            // Reset modal for next time
+            setTimeout(() => {
+              documentParts.forEach(part => {
+                part.style.transition = '';
+                part.style.opacity = '';
+                part.style.transform = '';
+                part.classList.remove('active');
+                part.style.animation = '';
+              });
+              documentAssembly.style.display = 'block';
+              documentIconFinal.style.display = 'none';
+            }, 500);
+          }, 2000);
+        }
+      }, 100);
+    }
+
+    // Download Report Button Handler - ENHANCED VERSION
+    document.getElementById('downloadReportBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Button click animation
+      const downloadBtn = document.getElementById('downloadReportBtn');
+      downloadBtn.animate([
+        { transform: 'scale(1)', boxShadow: '0 4px 6px rgba(233, 30, 99, 0.25)' },
+        { transform: 'scale(0.95)', boxShadow: '0 2px 4px rgba(233, 30, 99, 0.15)' },
+        { transform: 'scale(1)', boxShadow: '0 4px 6px rgba(233, 30, 99, 0.25)' }
+      ], {
+        duration: 300,
+        easing: 'ease-out'
+      });
+      
+      // Show loading modal and start progress simulation
+      document.getElementById('pdfProgressModal').style.display = 'block';
+      document.getElementById('download-spinner').style.display = 'inline-block';
+      document.getElementById('downloadReportBtn').disabled = true;
+      
+      // Reset progress elements
+      document.querySelector('.document-assembly').style.display = 'block';
+      document.getElementById('documentIconFinal').style.display = 'none';
+      document.querySelectorAll('.document-part').forEach(part => {
+        part.classList.remove('active');
+      });
+      
+      // Start the enhanced progress simulation
+      simulatePDFGenerationProgress();
+      
+      // Add confetti on completion
+      setTimeout(createConfetti, 2500);
+    });
+
+    // Session management - SIMPLIFIED
+    function checkSessionStatus() {
+      // Simple check - if we're on this page, session should be valid
+      console.log('Session check: User is viewing results page');
+      return true;
+    }
+
+    // Scroll button visibility management
+    function handleScrollButtons() {
+      const backToTop = document.getElementById('backToTop');
+      const backToDown = document.getElementById('backToDown');
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      // Show/hide back to top button based on scroll position
+      if (scrollPosition > 300) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+      
+      // Show/hide back to bottom button based on scroll position
+      if (scrollPosition + windowHeight < documentHeight - 100) {
+        backToDown.classList.add('visible');
+      } else {
+        backToDown.classList.remove('visible');
+      }
+    }
+    
+    window.addEventListener('DOMContentLoaded', (event) => {
+      console.log('Results page loaded successfully');
+      
+      // Initialize theme
+      initThemeToggle();
+      
+      // Create floating dots
+      createFloatingDots();
+      
+      // Initialize charts
+      initializeCharts();
+      
+      // Add animation delays for elements
+      document.querySelectorAll('.fade-in-up, .slide-in-left').forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.1}s`;
+      });
+
+      // Initialize scroll button visibility
+      handleScrollButtons();
+      window.addEventListener('scroll', handleScrollButtons);
+    });
+    
+    // Scroll Button Functionality
+    document.getElementById('backToTop').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.getElementById('backToDown').addEventListener('click', () => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

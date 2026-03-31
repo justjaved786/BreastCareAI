@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Prediction - BreastCare AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-pink: #e91e63;
+      --secondary-pink: #ad1457;
+      --accent-pink: #ec407a;
+      --gradient-purple: #8e24aa;
+      --light-pink: #f8bbd9;
+      --light-bg: #fce4ec;
+      --card-bg: #ffffff;
+      --text-dark: #212121;
+      --text-light: #757575;
+      --bg-white: #ffffff;
+      --bg-pink-100: #fce7f3;
+      --text-gray-800: #1f2937;
+      --text-gray-700: #374151;
+      --text-gray-600: #4b5563;
+      --text-gray-400: #9ca3af;
+      --text-color: #1f2937;
+    }
+   
+    [data-theme="dark"] {
+      --primary-pink: #f48fb1;
+      --secondary-pink: #ad1457;
+      --accent-pink: #f06292;
+      --light-pink: #4a1a2d;
+      --light-bg: #1a1a1a;
+      --card-bg: #2d2d2d;
+      --text-dark: #f5f5f5;
+      --text-light: #b0b0b0;
+      --bg-white: #2d2d2d;
+      --bg-pink-100: #4a1a2d;
+      --text-gray-800: #f5f5f5;
+      --text-gray-700: #e5e7eb;
+      --text-gray-600: #d1d5db;
+      --text-gray-400: #9ca3af;
+      --text-color: #ffffff;
+    }
+   
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-dark);
+      overflow-x: hidden;
+      transition: background-color 0.5s ease, color 0.5s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+   
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+    }
+
+    /* Glass Morphism Effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+   
+    [data-theme="dark"] .glass {
+      background: rgba(45, 45, 45, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Navigation */
+    .nav-link {
+      position: relative;
+      transition: all 0.3s ease;
+      color: var(--text-gray-700);
+    }
+   
+    [data-theme="dark"] .nav-link {
+      color: var(--text-gray-700);
+    }
+   
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+      transition: width 0.3s ease;
+    }
+   
+    .nav-link:hover::after {
+      width: 100%;
+    }
+   
+    /* Theme Toggle Button */
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      color: var(--text-dark);
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+   
+    [data-theme="dark"] .theme-toggle {
+      color: var(--text-dark);
+    }
+   
+    .theme-toggle:hover {
+      background: rgba(233, 30, 99, 0.1);
+    }
+   
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(244, 143, 177, 0.1);
+    }
+
+    /* User Profile Dropdown */
+    .profile-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .profile-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3);
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background-color: var(--card-bg);
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      z-index: 100;
+      overflow: hidden;
+      margin-top: 0.5rem;
+      border: 1px solid rgba(233, 30, 99, 0.1);
+    }
+
+    [data-theme="dark"] .dropdown-content {
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      border-color: rgba(244, 143, 177, 0.2);
+    }
+
+    .profile-dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .dropdown-content a {
+      color: var(--text-dark);
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: rgba(233, 30, 99, 0.1);
+    }
+
+    [data-theme="dark"] .dropdown-content a:hover {
+      background-color: rgba(244, 143, 177, 0.1);
+    }
+
+    /* Cards Styling */
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2.5rem;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(233, 30, 99, 0.1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    [data-theme="dark"] .card {
+      border-color: rgba(244, 143, 177, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 25px 50px rgba(233, 30, 99, 0.2);
+    }
+
+    [data-theme="dark"] .card:hover {
+      box-shadow: 0 25px 50px rgba(244, 143, 177, 0.3);
+    }
+
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+      color: white;
+    }
+
+    .card-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: var(--text-dark);
+    }
+
+    .card-description {
+      color: var(--text-light);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      flex-grow: 1;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-pink), var(--secondary-pink));
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      font-size: 1rem;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 15px rgba(233, 30, 99, 0.4);
+      color: white;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px) scale(1);
+    }
+
+    /* Inputs */
+    .input-style {
+      border: 1px solid rgba(233, 30, 99, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      width: 100%;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text-dark);
+    }
+
+    [data-theme="dark"] .input-style {
+      background: rgba(47, 53, 66, 0.9);
+      border-color: rgba(244, 143, 177, 0.2);
+      color: #e2e8f0;
+    }
+
+    .input-style:focus {
+      border-color: var(--primary-pink);
+      box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.2);
+      outline: none;
+      background: white;
+      transform: translateY(-2px);
+    }
+
+    [data-theme="dark"] .input-style:focus {
+      border-color: var(--accent-pink);
+      box-shadow: 0 0 0 3px rgba(244, 143, 177, 0.2);
+      background: rgba(47, 53, 66, 0.95);
+      color: #f3f4f6;
+    }
+
+    /* Improved Progress Bar */
+    .progress-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1rem 0;
+      border: 1px solid rgba(233, 30, 99, 0.1);
+    }
+
+    [data-theme="dark"] .progress-bar {
+      background: #475569;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-pink), var(--secondary-pink));
+      width: 0%;
+      transition: width 1s ease-in-out;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 20px 20px;
+      animation: move 1s linear infinite;
+    }
+
+    @keyframes move {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 20px 0;
+      }
+    }
+
+    /* Animation */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .floating {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    /* Error States */
+    .input-error {
+      border-color: #ef4444;
+      background-color: #fee2e2;
+    }
+
+    [data-theme="dark"] .input-error {
+      border-color: #f87171;
+      background-color: #4b1b1b;
+    }
+
+    .error-message {
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    [data-theme="dark"] .error-message {
+      color: #f87171;
+    }
+
+    /* Alert */
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      color: #dc2626;
+      border-left: 4px solid #dc2626;
+    }
+
+    [data-theme="dark"] .alert-danger {
+      background: #4b1b1b;
+      color: #f87171;
+      border-left-color: #f87171;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid #10b981;
+    }
+
+    [data-theme="dark"] .alert-success {
+      background: #064e3b;
+      color: #6ee7b7;
+      border-left-color: #10b981;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: #92400e;
+      border-left: 4px solid #f59e0b;
+    }
+
+    [data-theme="dark"] .alert-warning {
+      background: #78350f;
+      color: #fbbf24;
+      border-left-color: #f59e0b;
+    }
+
+    /* Improved Brain Animation */
+    .brain-animation {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 2rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brain-container {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(233, 30, 99, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 3px solid rgba(233, 30, 99, 0.2);
+      box-shadow: 0 0 20px rgba(233, 30, 99, 0.2);
+      animation: brain-container-pulse 3s infinite ease-in-out;
+    }
+
+    @keyframes brain-container-pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(233, 30, 99, 0.2);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(233, 30, 99, 0.4);
+      }
+    }
+
+    .brain-icon {
+      font-size: 4rem;
+      color: var(--primary-pink);
+      animation: brain-bounce 2s infinite ease-in-out;
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes brain-bounce {
+      0%, 100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translateY(-8px) scale(1.05) rotate(3deg);
+      }
+      50% {
+        transform: translateY(0) scale(1) rotate(0deg);
+      }
+      75% {
+        transform: translateY(-5px) scale(1.03) rotate(-2deg);
+      }
+    }
+
+    .neural-connections {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      animation: neural-pulse 3s infinite linear;
+    }
+
+    @keyframes neural-pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.4);
+        border-color: rgba(233, 30, 99, 0.2);
+      }
+      70% {
+        box-shadow: 0 0 0 20px rgba(233, 30, 99, 0);
+        border-color: rgba(233, 30, 99, 0.4);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(233, 30, 99, 0);
+        border-color: rgba(233, 30, 99, 0.2);
+      }
+    }
+
+    /* Improved Button Animation */
+    .btn-pulse {
+      animation: button-pulse 0.5s ease-in-out;
+    }
+
+    @keyframes button-pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 8px 15px rgba(233, 30, 99, 0.4);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px rgba(233, 30, 99, 0.25);
+      }
+    }
+
+    /* FIXED: Prediction Progress Modal Improvements */
+    .prediction-progress {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2;
+      width: 25%;
+    }
+
+    .step-indicator {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #64748b;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    [data-theme="dark"] .step-indicator {
+      background: #475569;
+      color: #94a3b8;
+    }
+
+    .step-indicator.active {
+      background: var(--primary-pink);
+      color: white;
+      transform: scale(1.2);
+      border-color: var(--secondary-pink);
+      box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      text-align: center;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .progress-line {
+      position: absolute;
+      top: 17px;
+      left: 15%;
+      right: 15%;
+      height: 3px;
+      background: #e2e8f0;
+      z-index: 1;
+      border-radius: 3px;
+    }
+
+    [data-theme="dark"] .progress-line {
+      background: #475569;
+    }
+
+    .progress-fill-line {
+      position: absolute;
+      top: 17px;
+      left: 15%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-pink), var(--secondary-pink));
+      width: 0%;
+      transition: width 1s ease;
+      z-index: 1;
+      border-radius: 3px;
+      max-width: calc(100% - 30%);
+    }
+
+    /* Feature Importance Badge */
+    .importance-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .importance-high { background: #fee2e2; color: #dc2626; }
+    .importance-medium { background: #fef3c7; color: #d97706; }
+    .importance-low { background: #d1fae5; color: #065f46; }
+
+    [data-theme="dark"] .importance-high { background: #7f1d1d; color: #fca5a5; }
+    [data-theme="dark"] .importance-medium { background: #78350f; color: #fdba74; }
+    [data-theme="dark"] .importance-low { background: #064e3b; color: #6ee7b7; }
+
+    /* Fixed Navbar Layout */
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0 2rem;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* Mobile menu button */
+    .mobile-menu-button {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-dark);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Social Media Colors - Fixed with original brand colors */
+    .social-x { color: #000000 !important; }
+    .social-facebook { color: #1877F2 !important; }
+    .social-whatsapp { color: #25D366 !important; }
+    .social-instagram { color: #E4405F !important; }
+    .social-linkedin { color: #0A66C2 !important; }
+    .social-youtube { color: #FF0000 !important; }
+
+    [data-theme="dark"] .social-x { color: #ffffff !important; }
+    [data-theme="dark"] .social-facebook { color: #1877F2 !important; }
+    [data-theme="dark"] .social-whatsapp { color: #25D366 !important; }
+    [data-theme="dark"] .social-instagram { color: #E4405F !important; }
+    [data-theme="dark"] .social-linkedin { color: #0A66C2 !important; }
+    [data-theme="dark"] .social-youtube { color: #FF0000 !important; }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .card {
+        padding: 1.5rem;
+      }
+
+      .card-title {
+        font-size: 1.5rem;
+      }
+
+      .grid-cols-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-cols-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-steps {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .progress-line, .progress-fill-line {
+        display: none;
+      }
+
+      /* Mobile navbar adjustments */
+      .nav-container {
+        padding: 0 1rem;
+      }
+      
+      .nav-center {
+        display: none;
+      }
+      
+      .mobile-menu-button {
+        display: block;
+      }
+      
+      .nav-right {
+        gap: 0.75rem;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .nav-center {
+        gap: 1.5rem;
+      }
+    }
+
+    /* Titles */
+    .title-text {
+      color: var(--primary-pink);
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    [data-theme="dark"] .title-text {
+      color: var(--accent-pink);
+    }
+
+    .subtitle-text {
+      color: var(--text-light);
+      font-size: 1.125rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Secondary Button */
+    .btn-secondary {
+      background: #64748b;
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 4px 6px rgba(100, 116, 139, 0.25);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+      transform: translateY(-2px);
+    }
+
+    /* Feature Icon */
+    .feature-icon {
+      background: var(--primary-pink);
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    [data-theme="dark"] .feature-icon {
+      background: var(--accent-pink);
+    }
+
+    /* Back to top */
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 3rem;
+      height: 3rem;
+      background: var(--primary-pink);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1000;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      transform: translateY(-3px);
+      background: var(--secondary-pink);
+    }
+
+    /* Form validation styles */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .required-field::after {
+      content: " *";
+      color: #ef4444;
+    }
+
+    /* Checkbox styling */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .checkbox-input {
+      margin-right: 0.5rem;
+    }
+
+    /* Model selection cards */
+    .model-card {
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .model-card:hover {
+      border-color: var(--primary-pink);
+      transform: translateY(-2px);
+    }
+
+    .model-card.selected {
+      border-color: var(--primary-pink);
+      background-color: rgba(233, 30, 99, 0.05);
+    }
+
+    [data-theme="dark"] .model-card {
+      border-color: #4b5563;
+    }
+
+    [data-theme="dark"] .model-card.selected {
+      background-color: rgba(244, 143, 177, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="globalProgressBar" style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1001; display: none;">
+    <div class="progress-fill" id="globalProgressFill"></div>
+  </div>
+
+  <!-- Navigation - Fixed Layout -->
+  <nav class="glass sticky top-0 z-50 py-4 bg-white/80 backdrop-blur-md">
+    <div class="nav-container">
+      <!-- Left: Logo and Title -->
+      <div class="nav-left">
+        <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-xl flex items-center justify-center shadow-lg">
+          <i class="fas fa-ribbon text-white"></i>
+        </div>
+        <span class="text-xl font-bold" style="color: var(--text-color, #1f2937);">
+          BreastCare<span style="color: #ec4899;">AI</span>
+        </span>
+      </div>
+     
+      <!-- Center: Navigation Links -->
+      <div class="nav-center hidden md:flex">
+        <a href="/common-page" class="nav-link font-medium">Dashboard</a>
+        <a href="/data-prediction" class="nav-link font-medium text-pink-600">Data Analysis</a>
+        <a href="/image-prediction" class="nav-link font-medium">Image Analysis</a>
+        <a href="/symptoms-assessment" class="nav-link font-medium">Symptoms Analysis</a>
+      </div>
+     
+      <!-- Right: Theme Toggle and Profile -->
+      <div class="nav-right">
+        <button id="navThemeToggle" class="theme-toggle">
+          <i class="fas fa-moon" id="navThemeIcon"></i>
+        </button>
+        
+        <!-- Mobile menu button -->
+        <button class="mobile-menu-button md:hidden">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="profile-dropdown">
+          <button class="profile-btn">
+            <i class="fas fa-user-circle"></i>
+            <span id="usernameDisplay">{{ user.name if user else 'User' }}</span>
+            <i class="fas fa-chevron-down ml-1"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/profile">
+              <i class="fas fa-user"></i>
+              <span>My Profile</span>
+            </a>
+            <a href="/logout" id="logoutLink">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-6 py-10 flex-1">
+    <!-- Hero Section -->
+<div class="card text-center mb-10 p-8 relative overflow-hidden">
+  <div class="absolute -top-10 -right-10 w-28 h-28 rounded-full bg-pink-100 opacity-50"></div>
+  <div class="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-pink-200 opacity-50"></div>
+
+  <div class="floating inline-block mb-6">
+    <div class="feature-icon mx-auto">
+      <i class="fas fa-microscope text-xl"></i>
+    </div>
+  </div>
+
+  <h1 class="title-text">Data-Based Analysis</h1>
+
+  <p class="subtitle-text">
+    Analyze structured numerical features using supervised machine learning
+    models to estimate breast cancer risk for educational purposes.
+  </p>
+
+  <div class="mt-8 flex justify-center gap-4 flex-wrap">
+    <a href="#predictionForm" class="btn-primary">
+      <i class="fas fa-magic mr-2"></i> Start Data Analysis
+    </a>
+    <a href="#featureInfo" class="btn-secondary">
+      <i class="fas fa-info-circle mr-2"></i> Feature Guide
+    </a>
+  </div>
+</div>
+
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'danger' %}
+          <div class="alert alert-danger mb-8">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>{{ message }}</span>
+          </div>
+          {% elif category == 'success' %}
+          <div class="alert alert-success mb-8">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ message }}</span>
+          </div>
+          {% elif category == 'warning' %}
+          <div class="alert alert-warning mb-8">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ message }}</span>
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Error Message -->
+    {% if error_message %}
+    <div class="alert alert-danger mb-8">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>{{ error_message }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Feature Information Section -->
+<div id="featureInfo" class="card p-8 mb-10">
+  <h2 class="text-2xl font-bold text-center mb-8">
+    Understanding Input Features
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Feature Importance -->
+    <div>
+      <h3 class="font-semibold text-lg mb-4 flex items-center">
+        <i class="fas fa-chart-line text-pink-500 mr-2"></i>
+        Feature Importance (Model Perspective)
+      </h3>
+
+      <div class="space-y-3">
+        {% for feature, importance in [
+          ('radius_mean', 0.28),
+          ('concave points_mean', 0.22),
+          ('perimeter_mean', 0.18),
+          ('concavity_mean', 0.12),
+          ('area_mean', 0.08),
+          ('compactness_mean', 0.06),
+          ('texture_mean', 0.04),
+          ('smoothness_mean', 0.02)
+        ] %}
+        <div class="flex justify-between items-center">
+          <span class="text-sm">
+            {{ feature.replace('_', ' ').title() }}
+          </span>
+          <span class="importance-badge
+            {% if importance > 0.15 %}importance-high
+            {% elif importance > 0.05 %}importance-medium
+            {% else %}importance-low{% endif %}">
+            {{ (importance * 100)|round(1) }}%
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div>
+      <h3 class="font-semibold text-lg mb-4 flex items-center">
+        <i class="fas fa-lightbulb text-pink-500 mr-2"></i>
+        Educational Notes
+      </h3>
+
+      <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+        <li class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+          <span>
+            Certain numerical features contribute more strongly to model decisions
+            based on learned statistical patterns.
+          </span>
+        </li>
+
+        <li class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+          <span>
+            Feature importance values reflect how much each input influences
+            the model’s output.
+          </span>
+        </li>
+
+        <li class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+          <span>
+            Sample data can be used to understand how changing inputs
+            affects model behavior.
+          </span>
+        </li>
+
+        <li class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+          <span>
+            Comparing outputs from different models helps illustrate
+            variation in machine learning approaches.
+          </span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+
+    <!-- Prediction Form -->
+    <div id="predictionForm" class="card p-8">
+      <h2 class="text-2xl font-bold mb-6 text-center"> Data-Based Analysis Input Form</h2>
+      <form id="predictionForm" action="{{ url_for('predict') }}" method="POST" class="space-y-8">
+        
+        <!-- Patient Details -->
+        <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+          <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center mr-3">
+              <i class="fas fa-user-injured"></i>
+            </div>
+             User Information
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-group">
+              <label for="patient_name" class="form-label required-field">
+                 User Name
+              </label>
+              <input type="text" id="patient_name" name="patient_name" 
+                     value="{{ form_data.patient_name | default('') }}" 
+                     placeholder="Enter patient's full name" 
+                     class="input-style" required>
+              <div class="error-message" id="patient_name_error">
+                Please enter a valid name (letters and spaces only).
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="age" class="form-label required-field">
+                Age
+              </label>
+              <input type="number" id="age" name="age" 
+                     value="{{ form_data.age | default('') }}" 
+                     placeholder="Enter age" 
+                     class="input-style" min="0" max="120" required>
+              <div class="error-message" id="age_error">
+                Age must be between 0 and 120.
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="gender" class="form-label required-field">
+                Gender
+              </label>
+              <select id="gender" name="gender" class="input-style" required>
+                <option value="">Select gender</option>
+                <option value="female" {{ 'selected' if form_data.gender == 'female' else '' }}>
+                  Female
+                </option>
+                <option value="male" {{ 'selected' if form_data.gender == 'male' else '' }}>
+                  Male
+                </option>
+                <option value="other" {{ 'selected' if form_data.gender == 'other' else '' }}>
+                  Other
+                </option>
+              </select>
+              <div class="error-message" id="gender_error">
+                Please select a gender.
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="medical_history" class="form-label">
+                Medical History / Notes
+              </label>
+              <textarea id="medical_history" name="medical_history" 
+                        placeholder="Enter any relevant medical history or notes..." 
+                        class="input-style h-20">{{ form_data.medical_history | default('') }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cell Features -->
+        <div>
+          <h2 class="text-xl font-semibold mb-6 flex items-center">
+            <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center mr-3">
+              <i class="fas fa-microscope"></i>
+            </div>
+            Cell Feature Inputs
+            <span class="text-sm font-normal text-gray-500 ml-2">(All fields are required)</span>
+          </h2>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for field in [
+              'radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 
+              'smoothness_mean', 'compactness_mean', 'concavity_mean', 'concave points_mean'
+            ] %}
+            <div class="form-group">
+              <label for="{{ field }}" class="form-label required-field flex items-center justify-between">
+                <span>{{ field.replace('_', ' ').title() }}</span>
+                {% set importance_map = {
+                  'radius_mean': 'high',
+                  'concave points_mean': 'high', 
+                  'perimeter_mean': 'medium',
+                  'concavity_mean': 'medium',
+                  'area_mean': 'low',
+                  'compactness_mean': 'low',
+                  'texture_mean': 'low',
+                  'smoothness_mean': 'low'
+                } %}
+                <span class="importance-badge importance-{{ importance_map[field] }} text-xs">
+                  {{ importance_map[field].title() }}
+                </span>
+              </label>
+              <input type="number" id="{{ field }}" name="{{ field }}" 
+                     value="{{ form_data[field] | default('') }}" 
+                     placeholder="0.00" 
+                     class="input-style" step="any" required 
+                     oninput="validateNumber(this)">
+              <div class="error-message" id="{{ field }}_error">
+                Please enter a valid number.
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Model Selection -->
+        <div>
+          <h3 class="block font-semibold mb-4 flex items-center">
+            <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center mr-3">
+              <i class="fas fa-brain"></i>
+            </div>
+            Machine Learning Models
+          </h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Select one or more models for analysis. Using multiple models provides more reliable results.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="model-card" onclick="toggleModelSelection('model-all')">
+              <input type="checkbox" id="model-all" name="model_name" value="all" 
+                     class="hidden" {{ 'checked' if not form_data.model_name or 'all' in form_data.model_name else '' }}>
+              <label for="model-all" class="flex flex-col cursor-pointer">
+                <div class="font-semibold flex items-center">
+                  <i class="fas fa-layer-group text-pink-500 mr-2"></i>
+                  All Models
+                </div>
+                <div class="text-sm text-gray-500 mt-1">SVM + Random Forest + Logistic Regression</div>
+              </label>
+            </div>
+            <div class="model-card" onclick="toggleModelSelection('model-svm')">
+              <input type="checkbox" id="model-svm" name="model_name" value="svm" 
+                     class="hidden" {{ 'checked' if form_data.model_name and 'svm' in form_data.model_name else '' }}>
+              <label for="model-svm" class="flex flex-col cursor-pointer">
+                <div class="font-semibold flex items-center">
+                  <i class="fas fa-project-diagram text-pink-500 mr-2"></i>
+                  SVM
+                </div>
+                <div class="text-sm text-gray-500 mt-1">Support Vector Machine</div>
+              </label>
+            </div>
+            <div class="model-card" onclick="toggleModelSelection('model-rf')">
+              <input type="checkbox" id="model-rf" name="model_name" value="random_forest" 
+                     class="hidden" {{ 'checked' if form_data.model_name and 'random_forest' in form_data.model_name else '' }}>
+              <label for="model-rf" class="flex flex-col cursor-pointer">
+                <div class="font-semibold flex items-center">
+                  <i class="fas fa-tree text-pink-500 mr-2"></i>
+                  Random Forest
+                </div>
+                <div class="text-sm text-gray-500 mt-1">Ensemble learning method</div>
+              </label>
+            </div>
+            <div class="model-card" onclick="toggleModelSelection('model-lr')">
+              <input type="checkbox" id="model-lr" name="model_name" value="logistic_regression" 
+                     class="hidden" {{ 'checked' if form_data.model_name and 'logistic_regression' in form_data.model_name else '' }}>
+              <label for="model-lr" class="flex flex-col cursor-pointer">
+                <div class="font-semibold flex items-center">
+                  <i class="fas fa-chart-bar text-pink-500 mr-2"></i>
+                  Logistic Regression
+                </div>
+                <div class="text-sm text-gray-500 mt-1">Statistical model</div>
+              </label>
+            </div>
+          </div>
+          <div class="error-message mt-2" id="model_selection_error" style="display: none;">
+            Please select at least one model for analysis.
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <button type="button" onclick="openSampleModal()" class="btn-secondary" aria-label="Load sample data">
+            <i class="fas fa-vial mr-2"></i> Load Example Dataset Values
+          </button>
+          <div class="flex items-center gap-4">
+            <button type="reset" onclick="resetForm()" class="px-6 py-2 border border-gray-300 rounded-full text-gray-600 hover:bg-gray-50 transition-colors duration-200">
+              <i class="fas fa-redo mr-2"></i> Reset Form
+            </button>
+            <button type="button" id="submit-btn" class="btn-primary flex items-center">
+              <i class="fas fa-brain mr-2"></i> Analyze Data
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Information Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+  
+  <div class="card text-center">
+    <div class="feature-icon mx-auto bg-blue-500">
+      <i class="fas fa-cogs"></i>
+    </div>
+    <h3 class="card-title">AI-Based Feature Analysis</h3>
+    <p class="card-description">
+      Machine learning models analyze cell nuclei measurements to identify patterns associated with benign and malignant tumors.
+    </p>
+  </div>
+  
+  <div class="card text-center">
+    <div class="feature-icon mx-auto bg-green-500">
+      <i class="fas fa-circle-check"></i>
+    </div>
+    <h3 class="card-title">Model-Driven Reliability</h3>
+    <p class="card-description">
+      Predictions are generated using trained models and validated through performance evaluation for reliable clinical insights.
+    </p>
+  </div>
+  
+  <div class="card text-center">
+    <div class="feature-icon mx-auto bg-purple-500">
+      <i class="fas fa-file-pdf"></i>
+    </div>
+    <h3 class="card-title">Clinical-Ready Reports</h3>
+    <p class="card-description">
+      Generate downloadable PDF reports containing prediction results, confidence scores, and supporting analysis.
+    </p>
+  </div>
+
+</div>
+</main>
+
+  <!-- Footer -->
+<footer class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white pt-16 pb-8 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+
+            <!-- Brand -->
+            <div>
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-700 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-ribbon text-white"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-gray-900 dark:text-white">BreastCareAI</span>
+                        <div class="text-xs text-gray-700 dark:text-gray-400 -mt-1">
+                            AI-Based Educational Risk Analysis Platform
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    BreastCareAI is an academic project demonstrating how machine learning
+                    and deep learning techniques can be applied to breast cancer-related
+                    data for educational and research purposes.
+                </p>
+
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-x-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:opacity-80 transition-opacity">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">Quick Links</h3>
+                <ul class="space-y-3">
+                    <li><a href="/" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Home</a></li>
+                    <li><a href="#features" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Features</a></li>
+                    <li><a href="#how-it-works" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">How It Works</a></li>
+                    <li><a href="#symptoms" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Symptoms</a></li>
+                    <li><a href="#prevention" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">Awareness</a></li>
+                    <li><a href="#about" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">About</a></li>
+                    <li><a href="#faq" class="text-gray-700 dark:text-gray-400 hover:text-pink-600 transition-colors">FAQ</a></li>
+                </ul>
+            </div>
+
+            <!-- Services -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">System Modules</h3>
+                <ul class="space-y-3">
+                    <li class="text-gray-700 dark:text-gray-400">Data-Based Prediction</li>
+                    <li class="text-gray-700 dark:text-gray-400">Image-Based Analysis</li>
+                    <li class="text-gray-700 dark:text-gray-400">Symptoms Assessment</li>
+                    <li class="text-gray-700 dark:text-gray-400">Risk Visualization</li>
+                    <li class="text-gray-700 dark:text-gray-400">Report Generation</li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <h3 class="text-lg font-semibold mb-6 text-gray-800 dark:text-white">Contact</h3>
+                <div class="space-y-3 text-gray-700 dark:text-gray-400">
+                    <p class="flex items-center">
+                        <i class="fas fa-envelope mr-3 text-pink-500"></i>
+                        breastcareai@gmail.com
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-3 text-pink-500"></i>
+                        Mumbai, India
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="border-t border-gray-300 dark:border-gray-800 pt-8 text-center">
+            <p class="text-gray-700 dark:text-gray-400 text-sm mb-2">
+                © 2025 BreastCareAI • Academic Project
+            </p>
+            <p class="text-gray-600 dark:text-gray-500 text-xs max-w-4xl mx-auto">
+                Disclaimer: BreastCareAI is an educational and research-based system.
+                It does not provide medical diagnosis, treatment, or professional healthcare advice.
+            </p>
+        </div>
+
+    </div>
+</footer>
+
+  <!-- Back to Top Button -->
+  <button onclick="scrollToTop()" class="back-to-top" id="topBtn" aria-label="Scroll to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Sample Data Modal -->
+  <div id="sampleModal" class="modal" role="dialog" aria-labelledby="sampleModalLabel">
+    <div class="modal-content">
+      <h2 id="sampleModalLabel" class="text-xl font-bold mb-4">Load Sample Data</h2>
+      <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+        Choose a sample dataset to populate the form and see how the system works:
+      </p>
+      <div class="space-y-3">
+        <button onclick="fillSample('highly_positive')" class="btn-primary w-full text-left flex items-center justify-between">
+          <span>Highly Positive (Cancer Likely)</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+        <button onclick="fillSample('negative')" class="btn-primary w-full text-left flex items-center justify-between">
+          <span>Negative (Cancer Unlikely)</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+      <button onclick="closeSampleModal()" class="btn-secondary w-full mt-4">
+        <i class="fas fa-times mr-2"></i> Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Prediction Progress Modal -->
+  <div id="predictionProgressModal" class="modal">
+    <div class="modal-content prediction-progress">
+      <div class="brain-animation">
+        <div class="neural-connections"></div>
+        <div class="brain-container">
+          <i class="fas fa-brain brain-icon"></i>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold mb-4">Analyzing Data</h2>
+      <p class="mb-6 text-gray-600 dark:text-gray-400">
+        Our AI models are processing your data and generating predictions...
+      </p>
+      
+      <div class="progress-steps">
+        <div class="progress-line"></div>
+        <div class="progress-fill-line" id="progressFillLine"></div>
+        
+        <div class="progress-step">
+          <div class="step-indicator" id="step1">1</div>
+          <div class="step-label">Data Validation</div>
+        </div>
+        <div class="progress-step">
+          <div class="step-indicator" id="step2">2</div>
+          <div class="step-label">Feature Processing</div>
+        </div>
+        <div class="progress-step">
+          <div class="step-indicator" id="step3">3</div>
+          <div class="step-label">Model Analysis</div>
+        </div>
+        <div class="progress-step">
+          <div class="step-indicator" id="step4">4</div>
+          <div class="step-label">Results Generation</div>
+        </div>
+      </div>
+      
+      <div class="progress-bar mt-6">
+        <div class="progress-fill" id="predictionProgressFill"></div>
+      </div>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400" id="progressPercentage">0% Complete</p>
+    </div>
+  </div>
+
+<script>
+    // Theme Management
+    function initTheme() {
+      const themeToggle = document.getElementById('navThemeToggle');
+      const themeIcon = document.getElementById('navThemeIcon');
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      
+      if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.className = 'fas fa-sun';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeIcon.className = 'fas fa-moon';
+      }
+      
+      themeToggle.addEventListener('click', () => {
+        if (document.documentElement.getAttribute('data-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'light');
+          localStorage.setItem('theme', 'light');
+          themeIcon.className = 'fas fa-moon';
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+          themeIcon.className = 'fas fa-sun';
+        }
+      });
+    }
+
+    // Sample Data Management
+    const sampleData = {
+      'highly_positive': {
+        'radius_mean': '17.99',
+        'texture_mean': '10.38',
+        'perimeter_mean': '122.8',
+        'area_mean': '1001.0',
+        'smoothness_mean': '0.1184',
+        'compactness_mean': '0.2776',
+        'concavity_mean': '0.3001',
+        'concave points_mean': '0.1471',
+        'patient_name': 'Sample Positive Case',
+        'age': '52',
+        'gender': 'female',
+        'medical_history': 'Sample data showing characteristics associated with malignant tumors'
+      },
+      'negative': {
+        'radius_mean': '7.76',
+        'texture_mean': '24.54',
+        'perimeter_mean': '47.92',
+        'area_mean': '181.0',
+        'smoothness_mean': '0.05263',
+        'compactness_mean': '0.04362',
+        'concavity_mean': '0.0',
+        'concave points_mean': '0.0',
+        'patient_name': 'Sample Negative Case',
+        'age': '45',
+        'gender': 'female',
+        'medical_history': 'Sample data showing characteristics associated with benign tumors'
+      }
+    };
+
+    function fillSample(type) {
+      const data = sampleData[type];
+      Object.keys(data).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+          element.value = data[key];
+          // Add visual feedback
+          element.classList.add('bg-green-50', 'border-green-200');
+          setTimeout(() => {
+            element.classList.remove('bg-green-50', 'border-green-200');
+          }, 2000);
+        }
+      });
+      
+      // Select all models
+      document.querySelectorAll('input[name="model_name"]').forEach(checkbox => {
+        checkbox.checked = true;
+        updateModelCard(checkbox.id, true);
+      });
+      
+      closeSampleModal();
+      showNotification(`Sample data (${type === 'highly_positive' ? 'Positive' : 'Negative'}) loaded successfully!`, 'success');
+    }
+
+    function openSampleModal() {
+      document.getElementById('sampleModal').style.display = 'block';
+    }
+
+    function closeSampleModal() {
+      document.getElementById('sampleModal').style.display = 'none';
+    }
+
+    // Model Selection Management
+    function toggleModelSelection(modelId) {
+      const checkbox = document.getElementById(modelId);
+      checkbox.checked = !checkbox.checked;
+      updateModelCard(modelId, checkbox.checked);
+      
+      // If "all" is selected, deselect individual models
+      if (modelId === 'model-all' && checkbox.checked) {
+        document.querySelectorAll('input[name="model_name"]:not(#model-all)').forEach(cb => {
+          cb.checked = false;
+          updateModelCard(cb.id, false);
+        });
+      }
+      
+      // If individual model is selected, deselect "all"
+      if (modelId !== 'model-all' && checkbox.checked) {
+        document.getElementById('model-all').checked = false;
+        updateModelCard('model-all', false);
+      }
+    }
+
+    function updateModelCard(modelId, isSelected) {
+      const card = document.querySelector(`.model-card input[id="${modelId}"]`).closest('.model-card');
+      if (isSelected) {
+        card.classList.add('selected');
+      } else {
+        card.classList.remove('selected');
+      }
+    }
+
+    // Form Validation
+    function validateNumber(input) {
+      const errorElement = document.getElementById(`${input.id}_error`);
+      if (input.value === '' || isNaN(parseFloat(input.value))) {
+        input.classList.add('input-error');
+        errorElement.style.display = 'block';
+        return false;
+      } else {
+        input.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+      }
+    }
+
+    function validateName(input) {
+      const errorElement = document.getElementById(`${input.id}_error`);
+      const namePattern = /^[A-Za-z\s]+$/;
+      
+      if (!input.value.trim() || !namePattern.test(input.value)) {
+        input.classList.add('input-error');
+        errorElement.style.display = 'block';
+        return false;
+      } else {
+        input.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+      }
+    }
+
+    function validateModelSelection() {
+      const modelSelected = document.querySelectorAll('input[name="model_name"]:checked').length > 0;
+      const errorElement = document.getElementById('model_selection_error');
+      
+      if (!modelSelected) {
+        errorElement.style.display = 'block';
+        return false;
+      } else {
+        errorElement.style.display = 'none';
+        return true;
+      }
+    }
+
+    function validateForm() {
+      let isValid = true;
+      
+      // Validate patient name
+      const nameInput = document.getElementById('patient_name');
+      if (!validateName(nameInput)) isValid = false;
+      
+      // Validate age
+      const ageInput = document.getElementById('age');
+      if (ageInput.value === '' || ageInput.value < 0 || ageInput.value > 120) {
+        ageInput.classList.add('input-error');
+        document.getElementById('age_error').style.display = 'block';
+        isValid = false;
+      } else {
+        ageInput.classList.remove('input-error');
+        document.getElementById('age_error').style.display = 'none';
+      }
+      
+      // Validate gender
+      const genderInput = document.getElementById('gender');
+      if (genderInput.value === '') {
+        genderInput.classList.add('input-error');
+        document.getElementById('gender_error').style.display = 'block';
+        isValid = false;
+      } else {
+        genderInput.classList.remove('input-error');
+        document.getElementById('gender_error').style.display = 'none';
+      }
+      
+      // Validate feature inputs
+      const numberInputs = document.querySelectorAll('input[type="number"]');
+      numberInputs.forEach(input => {
+        if (input.id !== 'age' && !validateNumber(input)) {
+          isValid = false;
+        }
+      });
+      
+      // Validate model selection
+      if (!validateModelSelection()) {
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+
+    // Progress Simulation - FIXED VERSION
+    function simulatePredictionProgress() {
+      const progressFill = document.getElementById('predictionProgressFill');
+      const progressFillLine = document.getElementById('progressFillLine');
+      const progressPercentage = document.getElementById('progressPercentage');
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 5 + 1;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          
+          // Update UI to show completion
+          progressFill.style.width = '100%';
+          progressFillLine.style.width = '70%';
+          progressPercentage.textContent = '100% Complete';
+          document.getElementById('step1').classList.add('active');
+          document.getElementById('step2').classList.add('active');
+          document.getElementById('step3').classList.add('active');
+          document.getElementById('step4').classList.add('active');
+          
+          // Submit form after progress completes - FIXED: Direct form submission
+          setTimeout(() => {
+            // Hide the modal first
+            document.getElementById('predictionProgressModal').style.display = 'none';
+            
+            // Get the form element - FIXED: Ensure we get the actual form
+            const form = document.querySelector('form#predictionForm');
+            if (form) {
+              console.log('Form found, submitting...');
+              form.submit();
+            } else {
+              console.error('Form not found!');
+              showNotification('Error: Could not submit form. Please try again.', 'error');
+            }
+          }, 500);
+        } else {
+          progressFill.style.width = `${progress}%`;
+          const progressLineWidth = Math.min(progress, 100) * 0.70;
+          progressFillLine.style.width = `${progressLineWidth}%`;
+          progressPercentage.textContent = `${Math.round(progress)}% Complete`;
+          
+          // Update step indicators
+          if (progress >= 25) document.getElementById('step1').classList.add('active');
+          if (progress >= 50) document.getElementById('step2').classList.add('active');
+          if (progress >= 75) document.getElementById('step3').classList.add('active');
+        }
+      }, 100);
+    }
+
+    // UI Utilities
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'error' ? 'bg-red-500 text-white' : 
+        type === 'success' ? 'bg-green-500 text-white' : 
+        'bg-blue-500 text-white'
+      }`;
+      notification.innerHTML = `
+        <div class="flex items-center">
+          <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'} mr-2"></i>
+          <span>${message}</span>
+        </div>
+      `;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+      // Reset model card selections
+      document.querySelectorAll('.model-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Clear any error messages
+      document.querySelectorAll('.error-message').forEach(error => {
+        error.style.display = 'none';
+      });
+      
+      // Clear input errors
+      document.querySelectorAll('.input-error').forEach(input => {
+        input.classList.remove('input-error');
+      });
+      
+      showNotification('Form has been reset.', 'success');
+    }
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      
+      // Initialize model card selections
+      document.querySelectorAll('input[name="model_name"]:checked').forEach(checkbox => {
+        updateModelCard(checkbox.id, true);
+      });
+      
+      // Back to top button visibility
+      window.addEventListener('scroll', () => {
+        const topBtn = document.getElementById('topBtn');
+        if (window.scrollY > 300) {
+          topBtn.classList.add('visible');
+        } else {
+          topBtn.classList.remove('visible');
+        }
+      });
+      
+      // Form submission - FIXED: Use proper form submission
+      document.getElementById('submit-btn').addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent default button behavior
+        
+        if (!validateForm()) {
+          // Scroll to first error
+          const firstError = document.querySelector('.input-error');
+          if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          return;
+        }
+        
+        // Show progress modal
+        document.getElementById('predictionProgressModal').style.display = 'block';
+        simulatePredictionProgress();
+      });
+      
+      // Input validation on blur
+      document.getElementById('patient_name').addEventListener('blur', function() {
+        validateName(this);
+      });
+      
+      document.getElementById('age').addEventListener('blur', function() {
+        if (this.value === '' || this.value < 0 || this.value > 120) {
+          this.classList.add('input-error');
+          document.getElementById('age_error').style.display = 'block';
+        } else {
+          this.classList.remove('input-error');
+          document.getElementById('age_error').style.display = 'none';
+        }
+      });
+      
+      // Close modals on outside click
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+          e.target.style.display = 'none';
+        }
+      });
+      
+      // Logout handling
+      document.getElementById('logoutLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to logout?')) {
+          fetch('/logout', {
+            method: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              window.location.href = '/welcome';
+            }
+          })
+          .catch(error => {
+            console.error('Logout error:', error);
+            window.location.href = '/logout';
+          });
+        }
+      });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.style.display = 'none';
+        });
+      }
+    });
+</script>
+</body>
+</html>
